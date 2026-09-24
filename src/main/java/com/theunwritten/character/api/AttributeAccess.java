@@ -1,6 +1,7 @@
 package com.theunwritten.character.api;
 
 import com.theunwritten.character.data.AttributeType;
+import com.theunwritten.character.attribute.AttributeModifier;
 
 /** Public API used by gameplay systems to read and modify character attributes. */
 public interface AttributeAccess {
