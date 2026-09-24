@@ -46,6 +46,11 @@ public final class EquipmentAttributeLifecycle {
         CharacterData character = CharacterAPI.getData(entity);
         ResourceLocation source = sourceFor(slot);
 
+        applyDeclaredModifiers(character, stack, source);
+        character.refreshResourceMaximums();
+    }
+
+    static void applyDeclaredModifiers(CharacterData character, ItemStack stack, ResourceLocation source) {
         character.attributeAccess().removeModifiersFromSource(source);
 
         ItemAttributeModifiers declared =
@@ -54,11 +59,9 @@ public final class EquipmentAttributeLifecycle {
         for (AttributeModifier modifier : declared.modifiers()) {
             character.attributeAccess().addModifier(modifier.withSource(source));
         }
-
-        character.refreshResourceMaximums();
     }
 
-    private static ResourceLocation sourceFor(EquipmentSlot slot) {
+    static ResourceLocation sourceFor(EquipmentSlot slot) {
         return ResourceLocation.fromNamespaceAndPath(
                 TheUnwritten.MODID,
                 "equipment/" + slot.getName());
