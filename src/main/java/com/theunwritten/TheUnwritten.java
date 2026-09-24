@@ -3,6 +3,7 @@ package com.theunwritten;
 import com.theunwritten.character.registry.CharacterAttachments;
 import com.theunwritten.item.registry.ItemDataComponents;
 import com.theunwritten.item.registry.EquipmentItems;
+import com.theunwritten.command.DebugCommands;
 
 import org.slf4j.Logger;
 
@@ -28,6 +29,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -115,6 +117,11 @@ public class TheUnwritten {
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
+    @SubscribeEvent
+    public void onRegisterCommands(RegisterCommandsEvent event) {
+        DebugCommands.register(event);
+    }
+
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
