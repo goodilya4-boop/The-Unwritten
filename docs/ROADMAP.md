@@ -21,9 +21,12 @@
 ## Phase 1.5 — Modifier & Equipment Foundation
 - [x] Единая модель AttributeModifier
 - [x] ADDITION / MULTIPLY_BASE / MULTIPLY_TOTAL
-- [ ] Жизненный цикл модификаторов экипировки
-- [ ] Базовое оружие
-- [ ] Базовая броня
+- [x] Удалить legacy ItemAttributeModifier/ItemAttributeHelper
+- [x] Перевести CharacterStats на эффективные атрибуты
+- [x] Уникальность модификатора по (source, id)
+- [x] Жизненный цикл модификаторов экипировки
+- [ ] Базовая интеграция предметных компонентов с конкретными предметами
+- [ ] Базовые предметы экипировки
 - [ ] Инструменты
 
 ## Phase 2 — Progression Foundation
@@ -36,7 +39,7 @@
 
 ## Phase 3 — Combat Foundation
 - [ ] Базовый бой
-- [ ] Оружейные техники
+- [ ] Техники владения
 - [ ] Воинские школы
 - [ ] Анимации
 
