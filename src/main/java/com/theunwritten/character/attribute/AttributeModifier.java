@@ -11,9 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 /**
  * A single, named modification to a character attribute.
  *
- * The identifier is stable within the source that owns the modifier. This is
- * important when a source is removed: the equipment system can remove exactly
- * the modifiers it previously applied instead of guessing from their values.
+ * The identifier is stable within the source that owns the modifier.
  */
 public record AttributeModifier(
         String id,
@@ -52,5 +50,9 @@ public record AttributeModifier(
             double amount,
             ResourceLocation source) {
         return new AttributeModifier(id, attribute, amount, AttributeModifierOperation.ADDITION, source);
+    }
+
+    public AttributeModifier withSource(ResourceLocation newSource) {
+        return new AttributeModifier(id, attribute, amount, operation, newSource);
     }
 }

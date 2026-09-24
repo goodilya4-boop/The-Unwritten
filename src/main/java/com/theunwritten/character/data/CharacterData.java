@@ -2,6 +2,7 @@ package com.theunwritten.character.data;
 
 import com.theunwritten.character.api.AttributeAccess;
 import com.theunwritten.character.api.CharacterAttributeAccess;
+
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -9,9 +10,8 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 /**
  * Persistent foundation data for a character.
  *
- * This class deliberately contains only the first foundation layer. Skills,
- * schools, progression history and hybrid interactions will be added as
- * independent systems rather than being folded into attributes.
+ * Runtime attribute modifiers are intentionally not serialized here. Equipment
+ * and other transient sources rebuild their modifiers from authoritative state.
  */
 public final class CharacterData implements INBTSerializable<CompoundTag> {
     private final Attributes attributes;
@@ -45,7 +45,7 @@ public final class CharacterData implements INBTSerializable<CompoundTag> {
     }
 
     public CharacterStats calculateStats() {
-        return CharacterStats.calculate(attributes);
+        return CharacterStats.calculate(attributeAccess);
     }
 
     public void refreshResourceMaximums() {
