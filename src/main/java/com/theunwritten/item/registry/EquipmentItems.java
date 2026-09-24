@@ -1,7 +1,5 @@
 package com.theunwritten.item.registry;
 
-import java.util.function.Supplier;
-
 import com.theunwritten.character.attribute.AttributeModifier;
 import com.theunwritten.character.attribute.AttributeModifierOperation;
 import com.theunwritten.character.data.AttributeType;
@@ -16,6 +14,10 @@ import static com.theunwritten.TheUnwritten.ITEMS;
 /** Minimal concrete equipment content used to exercise the modifier lifecycle. */
 public final class EquipmentItems {
     private EquipmentItems() {
+    }
+
+    public static void init() {
+        // Forces class initialization so the DeferredItem is registered.
     }
 
     private static final ResourceLocation TRAINING_CHARM_SOURCE =
