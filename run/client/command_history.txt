@@ -1,3 +1,2 @@
 /attributes
 /attribute
-/attributes
