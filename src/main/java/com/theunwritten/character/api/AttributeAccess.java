@@ -1,7 +1,9 @@
 package com.theunwritten.character.api;
 
-import com.theunwritten.character.data.AttributeType;
 import com.theunwritten.character.attribute.AttributeModifier;
+import com.theunwritten.character.data.AttributeType;
+
+import net.minecraft.resources.ResourceLocation;
 
 /** Public API used by gameplay systems to read and modify character attributes. */
 public interface AttributeAccess {
@@ -19,7 +21,7 @@ public interface AttributeAccess {
 
     boolean removeModifier(AttributeModifier modifier);
 
-    int removeModifiersFromSource(String source);
+    int removeModifiersFromSource(ResourceLocation source);
 
     void clearModifiers();
 }
