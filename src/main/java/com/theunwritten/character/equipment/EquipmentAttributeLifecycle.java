@@ -46,15 +46,18 @@ public final class EquipmentAttributeLifecycle {
         CharacterData character = CharacterAPI.getData(entity);
         ResourceLocation source = sourceFor(slot);
 
-        applyDeclaredModifiers(character, stack, source);
+        ItemAttributeModifiers declared =
+                stack.getOrDefault(ItemDataComponents.ATTRIBUTE_MODIFIERS.get(), ItemAttributeModifiers.empty());
+
+        applyDeclaredModifiers(character, declared, source);
         character.refreshResourceMaximums();
     }
 
-    static void applyDeclaredModifiers(CharacterData character, ItemStack stack, ResourceLocation source) {
+    static void applyDeclaredModifiers(
+            CharacterData character,
+            ItemAttributeModifiers declared,
+            ResourceLocation source) {
         character.attributeAccess().removeModifiersFromSource(source);
-
-        ItemAttributeModifiers declared =
-                stack.getOrDefault(ItemDataComponents.ATTRIBUTE_MODIFIERS.get(), ItemAttributeModifiers.empty());
 
         for (AttributeModifier modifier : declared.modifiers()) {
             character.attributeAccess().addModifier(modifier.withSource(source));
