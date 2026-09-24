@@ -2,6 +2,7 @@ package com.theunwritten;
 
 import com.theunwritten.character.registry.CharacterAttachments;
 import com.theunwritten.item.registry.ItemDataComponents;
+import com.theunwritten.item.registry.EquipmentItems;
 
 import org.slf4j.Logger;
 
@@ -79,6 +80,7 @@ public class TheUnwritten {
         CREATIVE_MODE_TABS.register(modEventBus);
         CharacterAttachments.ATTACHMENT_TYPES.register(modEventBus);
         ItemDataComponents.DATA_COMPONENT_TYPES.register(modEventBus);
+        EquipmentItems.init();
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (the_unwritten) to respond directly to events.
