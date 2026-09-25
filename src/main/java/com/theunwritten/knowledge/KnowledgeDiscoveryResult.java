@@ -6,5 +6,6 @@ package com.theunwritten.knowledge;
 public enum KnowledgeDiscoveryResult {
     SUCCESS,
     ALREADY_KNOWN,
-    UNKNOWN_KNOWLEDGE
+    UNKNOWN_KNOWLEDGE,
+    REQUIREMENTS_NOT_MET
 }
