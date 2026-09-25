@@ -27,7 +27,10 @@ public final class DebugCommands {
     }
 
     private static int showAttributes(CommandSourceStack source) {
-        ServerPlayer player = source.getPlayerOrException();
+        ServerPlayer player = source.getPlayer();
+        if (player == null) {
+            return 0;
+        }
         CharacterData data = player.getData(CharacterAttachments.CHARACTER_DATA);
 
         source.sendSuccess(() -> Component.literal("=== The Unwritten: Attributes ==="), false);
