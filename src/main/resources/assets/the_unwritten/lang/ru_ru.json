@@ -1,0 +1,8 @@
+{
+  "itemGroup.the_unwritten": "The Unwritten",
+  "item.the_unwritten.elemental_treatise": "Трактат об элементальной магии",
+  "message.the_unwritten.knowledge_book.discovered": "Вы обнаружили знание: %s",
+  "message.the_unwritten.knowledge_book.already_known": "Это знание вам уже известно: %s",
+  "message.the_unwritten.knowledge_book.requirements_not_met": "Вы пока не можете понять это знание.",
+  "message.the_unwritten.knowledge_book.unknown": "Эта книга не содержит распознаваемого знания."
+}
