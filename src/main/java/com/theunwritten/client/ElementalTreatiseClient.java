@@ -1,5 +1,6 @@
 package com.theunwritten.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.theunwritten.TheUnwritten;
 
 import net.minecraft.client.resources.model.BakedModel;
@@ -9,9 +10,9 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.model.BakedModelWrapper;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 @EventBusSubscriber(
         modid = TheUnwritten.MODID,
@@ -30,7 +31,7 @@ public final class ElementalTreatiseClient {
             ModelResourceLocation.inventory(
                     ResourceLocation.fromNamespaceAndPath(
                             TheUnwritten.MODID,
-                            "item/elemental_treatise"));
+                            "elemental_treatise"));
 
     private ElementalTreatiseClient() {
     }
@@ -42,22 +43,25 @@ public final class ElementalTreatiseClient {
 
     @SubscribeEvent
     public static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
+        BakedModel inventoryModel = event.getModels().get(ITEM_MODEL_LOCATION);
         BakedModel threeDModel = event.getModels().get(THREE_D_MODEL_LOCATION);
-        if (threeDModel == null) {
+
+        if (inventoryModel == null || threeDModel == null) {
             return;
         }
 
-        event.getModels().computeIfPresent(
+        event.getModels().put(
                 ITEM_MODEL_LOCATION,
-                (location, inventoryModel) ->
-                        new ElementalTreatiseBakedModel(inventoryModel, threeDModel));
+                new ElementalTreatiseBakedModel(inventoryModel, threeDModel));
     }
 
     private static final class ElementalTreatiseBakedModel
             extends BakedModelWrapper<BakedModel> {
         private final BakedModel threeDModel;
 
-        private ElementalTreatiseBakedModel(BakedModel inventoryModel, BakedModel threeDModel) {
+        private ElementalTreatiseBakedModel(
+                BakedModel inventoryModel,
+                BakedModel threeDModel) {
             super(inventoryModel);
             this.threeDModel = threeDModel;
         }
@@ -68,15 +72,17 @@ public final class ElementalTreatiseClient {
                 PoseStack poseStack,
                 boolean applyLeftHandTransform) {
             if (context == ItemDisplayContext.GUI) {
-                return super.applyTransform(
-                        context,
+                return ClientHooks.handleCameraTransforms(
                         poseStack,
+                        this.originalModel,
+                        context,
                         applyLeftHandTransform);
             }
 
-            return threeDModel.applyTransform(
-                    context,
+            return ClientHooks.handleCameraTransforms(
                     poseStack,
+                    this.threeDModel,
+                    context,
                     applyLeftHandTransform);
         }
     }
