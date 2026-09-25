@@ -1,7 +1,6 @@
 package com.theunwritten.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.theunwritten.character.data.AttributeType;
 import com.theunwritten.character.data.CharacterData;
 import com.theunwritten.character.registry.CharacterAttachments;
@@ -67,7 +66,7 @@ public final class DebugCommands {
 
         return 1;
     }
-}
+
     private static int showKnowledge(CommandSourceStack source) {
         ServerPlayer player = source.getPlayer();
         if (player == null) {
@@ -131,8 +130,7 @@ public final class DebugCommands {
                 elementalOffer);
 
         source.sendSuccess(
-                () -> Component.literal(
-                        "Elemental discovery: " + elementalResult.name()),
+                () -> Component.literal("Elemental discovery: " + elementalResult.name()),
                 false);
 
         KnowledgeDiscoveryResult blockedLightResult = discoveryService.discover(
@@ -160,10 +158,9 @@ public final class DebugCommands {
                 lightOffer);
 
         source.sendSuccess(
-                () -> Component.literal(
-                        "Light after studying Elemental: " + lightResult.name()),
+                () -> Component.literal("Light after studying Elemental: " + lightResult.name()),
                 false);
 
         return 1;
     }
-
+}
