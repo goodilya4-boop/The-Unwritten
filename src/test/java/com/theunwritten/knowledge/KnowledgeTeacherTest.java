@@ -2,6 +2,7 @@ package com.theunwritten.knowledge;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class KnowledgeTeacherTest {
         assertThrows(IllegalArgumentException.class,
                 () -> new KnowledgeTeacher(TEACHER_ID, null));
         assertThrows(IllegalArgumentException.class,
-                () -> new KnowledgeTeacher(TEACHER_ID, List.of((KnowledgeDiscoveryOffer) null)));
+                () -> new KnowledgeTeacher(TEACHER_ID, Arrays.asList((KnowledgeDiscoveryOffer) null)));
         assertThrows(IllegalArgumentException.class,
                 () -> new KnowledgeTeacher(TEACHER_ID, List.of(offer))
                         .offer(null));
