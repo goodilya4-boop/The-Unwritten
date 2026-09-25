@@ -2,7 +2,6 @@ package com.theunwritten.knowledge;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,8 +82,8 @@ public final class KnowledgeRegistry {
                 KnowledgeIds.Combat.FOUNDATION, KnowledgeDomain.COMBAT,
                 KnowledgeTier.FOUNDATION, null, false, false, false));
         registry.register(new KnowledgeDefinition(
-                KnowledgeIds.Engineering.MATERIAL, KnowledgeDomain.ENGINEERING,
-                KnowledgeTier.SCHOOL, null, false, false, false));
+                KnowledgeIds.Engineering.FOUNDATION, KnowledgeDomain.ENGINEERING,
+                KnowledgeTier.FOUNDATION, null, false, false, false));
     }
 
     private static void registerMagic(KnowledgeRegistry registry) {
@@ -147,7 +146,7 @@ public final class KnowledgeRegistry {
     }
 
     private static void registerEngineering(KnowledgeRegistry registry) {
-        ResourceLocation parent = KnowledgeIds.Engineering.MATERIAL;
+        ResourceLocation parent = KnowledgeIds.Engineering.FOUNDATION;
         registry.register(new KnowledgeDefinition(
                 KnowledgeIds.Engineering.MECHANICAL, KnowledgeDomain.ENGINEERING,
                 KnowledgeTier.SCHOOL, parent, false, false, false));
