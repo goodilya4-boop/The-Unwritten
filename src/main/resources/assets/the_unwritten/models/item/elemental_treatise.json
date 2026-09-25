@@ -1,6 +1,73 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "minecraft:item/book"
-  }
+	"format_version": "1.9.0",
+	"credit": "Made with Blockbench",
+	"parent": "None",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "the_unwritten:item/elemental_treatise_atlas_32x32",
+		"particle": "the_unwritten:item/elemental_treatise_atlas_32x32"
+	},
+	"elements": [
+		{
+			"name": "Pages",
+			"from": [6.5, 2, 1],
+			"to": [9.5, 12, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 7, 5]},
+			"faces": {
+				"north": {"uv": [15.16348, 0.75439, 15.74482, 7.36204], "texture": "#0"},
+				"east": {"uv": [10.06699, 0.75439, 14.90909, 7.20893], "texture": "#0"},
+				"south": {"uv": [15.16348, 0.75439, 15.74482, 7.36204], "texture": "#0"},
+				"west": {"uv": [10.0925, 0.75439, 14.90909, 7.20893], "texture": "#0"},
+				"up": {"uv": [13.5949, 7.86045, 10.11802, 7.30463], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [10.11802, 7.86045, 13.5949, 7.30463], "rotation": 90, "texture": "#0"}
+			}
+		},
+		{
+			"name": "Bottom Cover",
+			"from": [6, 1.5, 0.5],
+			"to": [6.5, 12.5, 9.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [6.25, 7, 5]},
+			"faces": {
+				"north": {"uv": [8.53589, 0.76475, 8.25518, 7.36204], "texture": "#0"},
+				"east": {"uv": [10.02951, 0.74482, 14.91228, 7.20175], "texture": "#0"},
+				"south": {"uv": [8.25518, 0.76475, 8.53589, 7.36204], "texture": "#0"},
+				"west": {"uv": [3.22488, 0.77033, 7.87799, 7.189], "texture": "#0"},
+				"up": {"uv": [8.25199, 7.37321, 8.51994, 0.76156], "texture": "#0"},
+				"down": {"uv": [8.25199, 0.76156, 8.51994, 7.37321], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Top Cover",
+			"from": [9.5, 1.5, 0.5],
+			"to": [10, 12.5, 9.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [9.5, 1.5, 0.5]},
+			"faces": {
+				"north": {"uv": [8.25518, 0.76475, 8.52313, 7.3748], "texture": "#0"},
+				"east": {"uv": [3.22887, 0.77033, 7.88198, 7.189], "texture": "#0"},
+				"south": {"uv": [2.64673, 0.73206, 2.94019, 7.38038], "texture": "#0"},
+				"west": {"uv": [10.0327, 0.75199, 14.91547, 7.19617], "texture": "#0"},
+				"up": {"uv": [8.52313, 7.3748, 8.25518, 0.75678], "texture": "#0"},
+				"down": {"uv": [8.52313, 0.75678, 8.25518, 7.3748], "texture": "#0"}
+			}
+		},
+		{
+			"name": "Spine",
+			"from": [6.5, 1.5, 9],
+			"to": [9.5, 12.5, 9.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [6.5, 1.5, 9]},
+			"faces": {
+				"north": {"uv": [15.16348, 0.75199, 15.73206, 7.36204], "texture": "#0"},
+				"east": {"uv": [16, 10.5, 16, 16], "texture": "#0"},
+				"south": {"uv": [1.16587, 0.71691, 2.33413, 7.9362], "texture": "#0"},
+				"west": {"uv": [16, 10.5, 16, 16], "texture": "#0"},
+				"up": {"uv": [4.47847, 7.38756, 3.24641, 7.62998], "texture": "#0"},
+				"down": {"uv": [4.47847, 7.38756, 3.24641, 7.62998], "texture": "#0"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"translation": [0, 0, -1.5]
+		}
+	}
 }
