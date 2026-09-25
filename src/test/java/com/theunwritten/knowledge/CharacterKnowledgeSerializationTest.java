@@ -16,9 +16,10 @@ class CharacterKnowledgeSerializationTest {
             ResourceLocation.fromNamespaceAndPath("the_unwritten", "magic/light");
 
     @Test
-    void serializeAndDeserializeRoundTripPreservesKnowledge() {
+    void serializeAndDeserializeRoundTripPreservesKnowledgeStates() {
         CharacterKnowledge original = new CharacterKnowledge();
         original.discover(FIRE);
+        original.study(FIRE);
         original.discover(LIGHT);
 
         CompoundTag tag = original.serializeNBT(null);
@@ -26,8 +27,8 @@ class CharacterKnowledgeSerializationTest {
         CharacterKnowledge restored = new CharacterKnowledge();
         restored.deserializeNBT(null, tag);
 
-        assertTrue(restored.knows(FIRE));
-        assertTrue(restored.knows(LIGHT));
+        assertEquals(KnowledgeState.STUDIED, restored.state(FIRE));
+        assertEquals(KnowledgeState.DISCOVERED, restored.state(LIGHT));
         assertEquals(2, restored.discoveredCount());
     }
 
@@ -35,7 +36,9 @@ class CharacterKnowledgeSerializationTest {
     void deserializeClearsExistingKnowledgeBeforeLoading() {
         CharacterKnowledge knowledge = new CharacterKnowledge();
         knowledge.discover(FIRE);
-        knowledge.deserializeNBT(null, new CharacterKnowledge().serializeNBT(null));
+
+        CompoundTag empty = new CompoundTag();
+        knowledge.deserializeNBT(null, empty);
 
         assertFalse(knowledge.knows(FIRE));
         assertEquals(0, knowledge.discoveredCount());
