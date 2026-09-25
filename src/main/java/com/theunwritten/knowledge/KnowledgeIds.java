@@ -39,6 +39,7 @@ public final class KnowledgeIds {
     }
 
     public static final class Engineering {
+        public static final ResourceLocation FOUNDATION = id("engineering/foundation");
         public static final ResourceLocation MATERIAL = id("engineering/material");
         public static final ResourceLocation MECHANICAL = id("engineering/mechanical");
         public static final ResourceLocation ALCHEMICAL = id("engineering/alchemical");
