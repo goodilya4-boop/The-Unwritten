@@ -12,23 +12,32 @@ class KnowledgeDiscoveryServiceTest {
             ResourceLocation.fromNamespaceAndPath("the_unwritten", "magic/unknown");
 
     @Test
-    void discoverRegistersKnownKnowledge() {
+    void discoverThroughContextRegistersKnownKnowledge() {
         KnowledgeDiscoveryService service =
                 new KnowledgeDiscoveryService(KnowledgeRegistry.createDefault());
         CharacterKnowledge characterKnowledge = new CharacterKnowledge();
 
-        assertTrue(service.discover(characterKnowledge, ELEMENTAL));
+        KnowledgeDiscoveryResult result = service.discover(new KnowledgeDiscoveryContext(
+                characterKnowledge,
+                ELEMENTAL,
+                KnowledgeDiscoverySource.TEACHER));
+
+        assertEquals(KnowledgeDiscoveryResult.SUCCESS, result);
         assertEquals(KnowledgeState.DISCOVERED, characterKnowledge.state(ELEMENTAL));
     }
 
     @Test
-    void discoveringSameKnowledgeTwiceDoesNotChangeState() {
+    void discoveringSameKnowledgeTwiceReturnsAlreadyKnown() {
         KnowledgeDiscoveryService service =
                 new KnowledgeDiscoveryService(KnowledgeRegistry.createDefault());
         CharacterKnowledge characterKnowledge = new CharacterKnowledge();
+        KnowledgeDiscoveryContext context = new KnowledgeDiscoveryContext(
+                characterKnowledge,
+                ELEMENTAL,
+                KnowledgeDiscoverySource.TEACHER);
 
-        assertTrue(service.discover(characterKnowledge, ELEMENTAL));
-        assertFalse(service.discover(characterKnowledge, ELEMENTAL));
+        assertEquals(KnowledgeDiscoveryResult.SUCCESS, service.discover(context));
+        assertEquals(KnowledgeDiscoveryResult.ALREADY_KNOWN, service.discover(context));
         assertEquals(KnowledgeState.DISCOVERED, characterKnowledge.state(ELEMENTAL));
     }
 
@@ -38,31 +47,61 @@ class KnowledgeDiscoveryServiceTest {
                 new KnowledgeDiscoveryService(KnowledgeRegistry.createDefault());
         CharacterKnowledge characterKnowledge = new CharacterKnowledge();
 
-        assertFalse(service.discover(characterKnowledge, UNKNOWN));
+        KnowledgeDiscoveryResult result = service.discover(new KnowledgeDiscoveryContext(
+                characterKnowledge,
+                UNKNOWN,
+                KnowledgeDiscoverySource.BOOK));
+
+        assertEquals(KnowledgeDiscoveryResult.UNKNOWN_KNOWLEDGE, result);
         assertFalse(characterKnowledge.knows(UNKNOWN));
     }
 
     @Test
-    void hiddenKnowledgeCanBeDiscoveredWhenExplicitlyGranted() {
+    void hiddenKnowledgeCanBeDiscoveredThroughExplicitSource() {
         KnowledgeDiscoveryService service =
                 new KnowledgeDiscoveryService(KnowledgeRegistry.createDefault());
         CharacterKnowledge characterKnowledge = new CharacterKnowledge();
 
-        assertTrue(service.discover(characterKnowledge, KnowledgeIds.Magic.VOID));
+        KnowledgeDiscoveryResult result = service.discover(new KnowledgeDiscoveryContext(
+                characterKnowledge,
+                KnowledgeIds.Magic.VOID,
+                KnowledgeDiscoverySource.PHENOMENON));
+
+        assertEquals(KnowledgeDiscoveryResult.SUCCESS, result);
         assertEquals(KnowledgeState.DISCOVERED,
                 characterKnowledge.state(KnowledgeIds.Magic.VOID));
     }
 
     @Test
-    void nullArgumentsAreRejected() {
+    void lowLevelDiscoveryRemainsAvailable() {
+        KnowledgeDiscoveryService service =
+                new KnowledgeDiscoveryService(KnowledgeRegistry.createDefault());
+        CharacterKnowledge characterKnowledge = new CharacterKnowledge();
+
+        assertTrue(service.discover(characterKnowledge, ELEMENTAL));
+        assertFalse(service.discover(characterKnowledge, ELEMENTAL));
+    }
+
+    @Test
+    void nullContextIsRejected() {
         KnowledgeDiscoveryService service =
                 new KnowledgeDiscoveryService(KnowledgeRegistry.createDefault());
 
-        assertThrows(IllegalArgumentException.class,
-                () -> service.discover(null, ELEMENTAL));
+        assertThrows(IllegalArgumentException.class, () -> service.discover(null));
+    }
+
+    @Test
+    void nullContextValuesAreRejected() {
+        CharacterKnowledge knowledge = new CharacterKnowledge();
 
         assertThrows(IllegalArgumentException.class,
-                () -> service.discover(new CharacterKnowledge(), null));
+                () -> new KnowledgeDiscoveryContext(null, ELEMENTAL,
+                        KnowledgeDiscoverySource.TEACHER));
+        assertThrows(IllegalArgumentException.class,
+                () -> new KnowledgeDiscoveryContext(knowledge, null,
+                        KnowledgeDiscoverySource.TEACHER));
+        assertThrows(IllegalArgumentException.class,
+                () -> new KnowledgeDiscoveryContext(knowledge, ELEMENTAL, null));
     }
 
     @Test
