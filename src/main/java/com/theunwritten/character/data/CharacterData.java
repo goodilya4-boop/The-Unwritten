@@ -2,6 +2,7 @@ package com.theunwritten.character.data;
 
 import com.theunwritten.character.api.AttributeAccess;
 import com.theunwritten.character.api.CharacterAttributeAccess;
+import com.theunwritten.knowledge.CharacterKnowledge;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -18,12 +19,14 @@ public final class CharacterData implements INBTSerializable<CompoundTag> {
     private final AttributeAccess attributeAccess;
     private final Potential potential;
     private final CharacterResources resources;
+    private final CharacterKnowledge knowledge;
 
     public CharacterData() {
         this.attributes = new Attributes(20.0D);
         this.attributeAccess = new CharacterAttributeAccess(attributes);
         this.potential = new Potential(100.0D);
         this.resources = new CharacterResources();
+        this.knowledge = new CharacterKnowledge();
         refreshResourceMaximums();
         restoreAllResources();
     }
@@ -42,6 +45,10 @@ public final class CharacterData implements INBTSerializable<CompoundTag> {
 
     public CharacterResources resources() {
         return resources;
+    }
+
+    public CharacterKnowledge knowledge() {
+        return knowledge;
     }
 
     public CharacterStats calculateStats() {
@@ -64,6 +71,7 @@ public final class CharacterData implements INBTSerializable<CompoundTag> {
         tag.put("Attributes", attributes.serializeNBT(provider));
         tag.put("Potential", potential.serializeNBT(provider));
         tag.put("Resources", resources.serializeNBT(provider));
+        tag.put("Knowledge", knowledge.serializeNBT(provider));
         return tag;
     }
 
@@ -80,6 +88,9 @@ public final class CharacterData implements INBTSerializable<CompoundTag> {
         } else {
             refreshResourceMaximums();
             restoreAllResources();
+        }
+        if (tag.contains("Knowledge")) {
+            knowledge.deserializeNBT(provider, tag.getCompound("Knowledge"));
         }
     }
 }
