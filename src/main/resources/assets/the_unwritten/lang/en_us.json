@@ -2,12 +2,17 @@
   "itemGroup.examplemod": "Example Mod Tab",
   "block.examplemod.example_block": "Example Block",
   "item.examplemod.example_item": "Example Item",
-
   "examplemod.configuration.title": "Example Mod Configs",
   "examplemod.configuration.section.examplemod.common.toml": "Example Mod Configs",
   "examplemod.configuration.section.examplemod.common.toml.title": "Example Mod Configs",
   "examplemod.configuration.items": "Item List",
   "examplemod.configuration.logDirtBlock": "Log Dirt Block",
   "examplemod.configuration.magicNumberIntroduction": "Magic Number Text",
-  "examplemod.configuration.magicNumber": "Magic Number"
+  "examplemod.configuration.magicNumber": "Magic Number",
+  "itemGroup.the_unwritten": "The Unwritten",
+  "item.the_unwritten.elemental_treatise": "Treatise of Elemental Magic",
+  "message.the_unwritten.knowledge_book.discovered": "You discovered knowledge: %s",
+  "message.the_unwritten.knowledge_book.already_known": "You already know this knowledge: %s",
+  "message.the_unwritten.knowledge_book.requirements_not_met": "You cannot understand this knowledge yet.",
+  "message.the_unwritten.knowledge_book.unknown": "This book contains no recognizable knowledge."
 }
