@@ -20,7 +20,34 @@ public final class KnowledgeDiscoveryService {
     }
 
     /**
-     * Attempts to discover knowledge for a character.
+     * Attempts to discover knowledge through an explicit world source.
+     *
+     * <p>The source is recorded in the context for future source-specific
+     * rules. At this layer, every explicit source is sufficient to attempt
+     * discovery, including sources that expose rare or hidden knowledge.</p>
+     */
+    public KnowledgeDiscoveryResult discover(KnowledgeDiscoveryContext context) {
+        if (context == null) {
+            throw new IllegalArgumentException("Discovery context cannot be null");
+        }
+
+        CharacterKnowledge characterKnowledge = context.characterKnowledge();
+        ResourceLocation knowledgeId = context.knowledgeId();
+
+        if (!registry.contains(knowledgeId)) {
+            return KnowledgeDiscoveryResult.UNKNOWN_KNOWLEDGE;
+        }
+
+        if (!characterKnowledge.discover(knowledgeId)) {
+            return KnowledgeDiscoveryResult.ALREADY_KNOWN;
+        }
+
+        return KnowledgeDiscoveryResult.SUCCESS;
+    }
+
+    /**
+     * Low-level discovery operation retained for callers that already have
+     * a resolved knowledge source.
      *
      * @return {@code true} when the knowledge was newly discovered
      */
@@ -31,10 +58,12 @@ public final class KnowledgeDiscoveryService {
         if (knowledgeId == null) {
             throw new IllegalArgumentException("Knowledge id cannot be null");
         }
-        if (!registry.contains(knowledgeId)) {
-            return false;
-        }
 
-        return characterKnowledge.discover(knowledgeId);
+        KnowledgeDiscoveryResult result = discover(new KnowledgeDiscoveryContext(
+                characterKnowledge,
+                knowledgeId,
+                KnowledgeDiscoverySource.EVENT));
+
+        return result == KnowledgeDiscoveryResult.SUCCESS;
     }
 }
