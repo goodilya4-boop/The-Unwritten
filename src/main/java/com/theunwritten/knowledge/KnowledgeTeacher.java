@@ -1,5 +1,6 @@
 package com.theunwritten.knowledge;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,13 +24,17 @@ public record KnowledgeTeacher(
             throw new IllegalArgumentException("Teacher offers cannot be null");
         }
 
-        offers = List.copyOf(offers);
-
-        for (int i = 0; i < offers.size(); i++) {
-            KnowledgeDiscoveryOffer offer = offers.get(i);
+        List<KnowledgeDiscoveryOffer> copiedOffers = new ArrayList<>(offers.size());
+        for (KnowledgeDiscoveryOffer offer : offers) {
             if (offer == null) {
                 throw new IllegalArgumentException("Teacher offer cannot be null");
             }
+            copiedOffers.add(offer);
+        }
+        offers = List.copyOf(copiedOffers);
+
+        for (int i = 0; i < offers.size(); i++) {
+            KnowledgeDiscoveryOffer offer = offers.get(i);
             for (int j = i + 1; j < offers.size(); j++) {
                 if (offer.knowledgeId().equals(offers.get(j).knowledgeId())) {
                     throw new IllegalArgumentException(
