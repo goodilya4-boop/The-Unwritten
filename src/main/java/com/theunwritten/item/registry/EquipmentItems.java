@@ -24,17 +24,16 @@ public final class EquipmentItems {
             ResourceLocation.fromNamespaceAndPath("the_unwritten", "training_charm");
 
     public static final DeferredItem<Item> TRAINING_CHARM = ITEMS.register(
-            "training_charm",
-            registryName -> new Item(new Item.Properties()
-                    .setId(registryName)
-                    .stacksTo(1)
-                    .component(
-                            ItemDataComponents.ATTRIBUTE_MODIFIERS.get(),
-                            new ItemAttributeModifiers(java.util.List.of(
-                                    new AttributeModifier(
-                                            "training_charm.wil",
-                                            AttributeType.WIL,
-                                            5.0D,
-                                            AttributeModifierOperation.ADDITION,
-                                            TRAINING_CHARM_SOURCE))))));
+        "training_charm",
+        ignored -> new Item(new Item.Properties()
+                .stacksTo(1)
+                .component(
+                        ItemDataComponents.ATTRIBUTE_MODIFIERS.get(),
+                        new ItemAttributeModifiers(java.util.List.of(
+                                new AttributeModifier(
+                                        "training_charm.wil",
+                                        AttributeType.WIL,
+                                        5.0D,
+                                        AttributeModifierOperation.ADDITION,
+                                        TRAINING_CHARM_SOURCE))))));
 }
