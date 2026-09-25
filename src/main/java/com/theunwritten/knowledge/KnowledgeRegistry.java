@@ -148,6 +148,9 @@ public final class KnowledgeRegistry {
     private static void registerEngineering(KnowledgeRegistry registry) {
         ResourceLocation parent = KnowledgeIds.Engineering.FOUNDATION;
         registry.register(new KnowledgeDefinition(
+                KnowledgeIds.Engineering.MATERIAL, KnowledgeDomain.ENGINEERING,
+                KnowledgeTier.SCHOOL, parent, false, false, false));
+        registry.register(new KnowledgeDefinition(
                 KnowledgeIds.Engineering.MECHANICAL, KnowledgeDomain.ENGINEERING,
                 KnowledgeTier.SCHOOL, parent, false, false, false));
         registry.register(new KnowledgeDefinition(
