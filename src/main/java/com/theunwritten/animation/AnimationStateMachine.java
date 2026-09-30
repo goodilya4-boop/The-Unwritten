@@ -23,12 +23,19 @@ public final class AnimationStateMachine {
         return true;
     }
 
-    private static MovementAnimationState resolveMovementState(LocalPlayer player) {
+    public static MovementAnimationState resolveMovementState(LocalPlayer player) {
+        Objects.requireNonNull(player, "player");
+
         boolean crouching = player.isCrouching();
         boolean moving = player.getDeltaMovement().horizontalDistanceSqr() > 0.0001D;
+        boolean running = moving && player.isSprinting();
 
         if (crouching) {
             return moving ? MovementAnimationState.CROUCH_WALK : MovementAnimationState.CROUCH;
+        }
+
+        if (running) {
+            return MovementAnimationState.RUN;
         }
 
         return moving ? MovementAnimationState.WALK : MovementAnimationState.IDLE;
