@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.theunwritten.character.CharacterAttachments;
 import com.theunwritten.character.CharacterAttributeCommand;
 import com.theunwritten.character.CharacterRuntimeEvents;
+import com.theunwritten.knowledge.KnowledgeCommand;
 import org.slf4j.Logger;
 
 import net.neoforged.bus.api.IEventBus;
@@ -18,6 +19,7 @@ public class TheUnwritten {
     public TheUnwritten(IEventBus modEventBus) {
         CharacterAttachments.ATTACHMENT_TYPES.register(modEventBus);
         NeoForge.EVENT_BUS.addListener(CharacterAttributeCommand::register);
+        NeoForge.EVENT_BUS.addListener(KnowledgeCommand::register);
         NeoForge.EVENT_BUS.addListener(CharacterRuntimeEvents::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(CharacterRuntimeEvents::onPlayerLoggedIn);
         NeoForge.EVENT_BUS.addListener(CharacterRuntimeEvents::onPlayerRespawn);
