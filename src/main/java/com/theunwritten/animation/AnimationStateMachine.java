@@ -1,6 +1,6 @@
 package com.theunwritten.animation;
 
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.Objects;
 
@@ -11,7 +11,7 @@ public final class AnimationStateMachine {
         return movementState;
     }
 
-    public boolean update(LocalPlayer player) {
+    public boolean update(Player player) {
         Objects.requireNonNull(player, "player");
 
         MovementAnimationState next = resolveMovementState(player);
@@ -23,7 +23,7 @@ public final class AnimationStateMachine {
         return true;
     }
 
-    public static MovementAnimationState resolveMovementState(LocalPlayer player) {
+    public static MovementAnimationState resolveMovementState(Player player) {
         Objects.requireNonNull(player, "player");
 
         boolean crouching = player.isCrouching();
