@@ -58,6 +58,13 @@ public final class ClientAnimationRuntime {
             }
 
             CONTROLLER.tick();
+
+            if (minecraft.player != null
+                    && CONTROLLER.state() == AnimationState.COMPLETED
+                    && CONTROLLER.current() != null
+                    && CONTROLLER.current().layer() == AnimationLayer.ACTION) {
+                playCurrentMovement(minecraft);
+            }
         }
 
         private static void updateMovement(Minecraft minecraft) {
@@ -65,18 +72,23 @@ public final class ClientAnimationRuntime {
                 return;
             }
 
+            playCurrentMovement(minecraft);
+            minecraft.player.displayClientMessage(
+                    Component.literal("Movement animation: " + CONTROLLER.current().id()),
+                    true
+            );
+        }
+
+        private static void playCurrentMovement(Minecraft minecraft) {
             AnimationDefinition definition = switch (STATE_MACHINE.movementState()) {
                 case IDLE -> AnimationContent.IMPERIAL_IDLE;
                 case WALK -> AnimationContent.MOVEMENT_WALK;
                 case CROUCH -> AnimationContent.MOVEMENT_CROUCH;
                 case CROUCH_WALK -> AnimationContent.MOVEMENT_CROUCH_WALK;
+                case RUN -> AnimationContent.MOVEMENT_RUN;
             };
 
             CONTROLLER.play(definition);
-            minecraft.player.displayClientMessage(
-                    Component.literal("Movement animation: " + definition.id()),
-                    true
-            );
         }
 
         private static void playTestAnimation() {
