@@ -11,7 +11,7 @@ public final class KnowledgeContent {
     public static final KnowledgeNode IMPERIAL_FENCING_NODE = new KnowledgeNode(
             IMPERIAL_FENCING,
             "Imperial Fencing",
-            "combat",
+            null,
             1,
             Set.of(),
             List.of(
