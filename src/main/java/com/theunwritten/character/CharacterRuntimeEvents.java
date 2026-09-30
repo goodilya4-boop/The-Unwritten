@@ -15,7 +15,7 @@ public final class CharacterRuntimeEvents {
             return;
         }
 
-        if (player.tickCount % 20 == 0) {
+        if (player.tickCount % 2 == 0) {
             CharacterData data = player.getData(CharacterAttachments.CHARACTER_DATA);
             Map<StatType, Double> stats = data.stats();
 
