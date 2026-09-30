@@ -27,8 +27,8 @@ public class CustomMainMenuScreen extends Screen {
     protected void init() {
         super.init();
 
-        int buttonWidth = 220;
-        int buttonHeight = 20;
+        int buttonWidth = 250;
+        int buttonHeight = 30;
         int x = (this.width - buttonWidth) / 2;
 
         int startY = this.height / 2 - 20;
@@ -36,48 +36,64 @@ public class CustomMainMenuScreen extends Screen {
 
         // Одиночная игра
         this.addRenderableWidget(
-                Button.builder(
+                new CustomButton(
+                        x,
+                        startY,
+                        buttonWidth,
+                        buttonHeight,
                         Component.literal("Одиночная игра"),
                         button -> {
                             this.minecraft.setScreen(
                                     new SelectWorldScreen(this)
                             );
                         }
-                ).bounds(x, startY, buttonWidth, buttonHeight).build()
+                )
         );
 
         // Сетевая игра
         this.addRenderableWidget(
-                Button.builder(
+                new CustomButton(
+                        x,
+                        startY + gap,
+                        buttonWidth,
+                        buttonHeight,
                         Component.literal("Сетевая игра"),
                         button -> {
                             this.minecraft.setScreen(
                                     new JoinMultiplayerScreen(this)
                             );
                         }
-                ).bounds(x, startY + gap, buttonWidth, buttonHeight).build()
+                )
         );
 
         // Настройки
         this.addRenderableWidget(
-                Button.builder(
+                new CustomButton(
+                        x,
+                        startY + gap * 2,
+                        buttonWidth,
+                        buttonHeight,
                         Component.literal("Настройки"),
                         button -> {
                             this.minecraft.setScreen(
                                     new OptionsScreen(this, this.minecraft.options)
                             );
                         }
-                ).bounds(x, startY + gap * 2, buttonWidth, buttonHeight).build()
+                )
         );
 
         // Выход
         this.addRenderableWidget(
-                Button.builder(
+                new CustomButton(
+                        x,
+                        startY + gap * 3,
+                        buttonWidth,
+                        buttonHeight,
                         Component.literal("Выход"),
                         button -> {
                             this.minecraft.stop();
                         }
-                ).bounds(x, startY + gap * 3, buttonWidth, buttonHeight).build()
+                )
         );
     }
 
