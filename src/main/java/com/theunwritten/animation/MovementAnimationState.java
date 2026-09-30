@@ -4,5 +4,6 @@ public enum MovementAnimationState {
     IDLE,
     WALK,
     CROUCH,
-    CROUCH_WALK
+    CROUCH_WALK,
+    RUN
 }
