@@ -52,6 +52,7 @@ public final class CharacterRuntimeEvents {
             Map<StatType, Double> stats = data.stats();
             data.resources().set(ResourceType.HEALTH, player.getHealth());
             data.resources().clampToMax(stats);
+            com.theunwritten.network.ResourceSyncServer.send(player);
         }
     }
 
