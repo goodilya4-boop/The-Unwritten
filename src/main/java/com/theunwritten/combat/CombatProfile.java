@@ -8,12 +8,14 @@ public final class CombatProfile {
     private WeaponType activeWeapon;
     private DefenseType activeDefense = DefenseType.UNARMED;
     private CombatState state = CombatState.INACTIVE;
+    private CombatAction currentAction = CombatAction.NONE;
 
     public WeaponSchool activeWeaponSchool() { return activeWeaponSchool; }
     public DefenseSchool activeDefenseSchool() { return activeDefenseSchool; }
     public WeaponType activeWeapon() { return activeWeapon; }
     public DefenseType activeDefense() { return activeDefense; }
     public CombatState state() { return state; }
+    public CombatAction currentAction() { return currentAction; }
 
     public void setWeaponSchool(WeaponSchool school) {
         activeWeaponSchool = Objects.requireNonNull(school, "school");
@@ -39,5 +41,9 @@ public final class CombatProfile {
 
     public void setState(CombatState state) {
         this.state = Objects.requireNonNull(state, "state");
+    }
+
+    public void setCurrentAction(CombatAction action) {
+        this.currentAction = Objects.requireNonNull(action, "action");
     }
 }
