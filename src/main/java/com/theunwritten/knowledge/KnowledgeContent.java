@@ -2,6 +2,7 @@ package com.theunwritten.knowledge;
 
 import com.theunwritten.character.AttributeType;
 
+import java.util.List;
 import java.util.Set;
 
 public final class KnowledgeContent {
@@ -13,19 +14,15 @@ public final class KnowledgeContent {
             "combat",
             1,
             Set.of(),
-            java.util.List.of(
+            List.of(
                     new MinimumAttributeRequirement(AttributeType.DEX, 20.0D),
                     new MinimumAttributeRequirement(AttributeType.PER, 20.0D)
             ),
-            java.util.List.of(
-                    new KnowledgeUnlock("weapon_school:" + ImperialSchoolIds.IMPERIAL_FENCING)
+            List.of(
+                    new KnowledgeUnlock("weapon_school:imperial_fencing")
             )
     );
 
     private KnowledgeContent() {
-    }
-
-    private static final class ImperialSchoolIds {
-        private static final String IMPERIAL_FENCING = "imperial_fencing";
     }
 }
