@@ -27,12 +27,12 @@ public class CustomMainMenuScreen extends Screen {
     protected void init() {
         super.init();
 
-        int buttonWidth = 250;
-        int buttonHeight = 30;
+        int buttonWidth = 140;
+        int buttonHeight = 25;
         int x = (this.width - buttonWidth) / 2;
 
         int startY = this.height / 2 - 20;
-        int gap = 25;
+        int gap = 30;
 
         // Одиночная игра
         this.addRenderableWidget(
