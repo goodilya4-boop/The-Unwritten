@@ -58,7 +58,7 @@ public final class CharacterResources implements INBTSerializable<CompoundTag> {
         for (ResourceType type : ResourceType.values()) {
             double maximum = max(type, stats);
             double regeneration = Math.max(0.0D, stats.getOrDefault(type.regenStat(), 0.0D));
-            set(type, Math.min(maximum, current(type) + regeneration));
+            set(type, Math.min(maximum, current(type) + regeneration / 20.0D));
         }
     }
 
