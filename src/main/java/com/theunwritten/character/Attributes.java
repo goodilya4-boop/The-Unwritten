@@ -1,12 +1,10 @@
 package com.theunwritten.character;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public final class Attributes implements INBTSerializable<CompoundTag> {
     public static final double DEFAULT_VALUE = 20.0D;
@@ -74,7 +72,7 @@ public final class Attributes implements INBTSerializable<CompoundTag> {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         for (AttributeType type : AttributeType.values()) {
             tag.putDouble(NBT_PREFIX + type.name(), get(type));
@@ -83,7 +81,7 @@ public final class Attributes implements INBTSerializable<CompoundTag> {
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         for (AttributeType type : AttributeType.values()) {
             String key = NBT_PREFIX + type.name();
             if (tag.contains(key)) {
@@ -94,7 +92,9 @@ public final class Attributes implements INBTSerializable<CompoundTag> {
 
     private static void validateValue(double value) {
         if (!Double.isFinite(value) || value < MIN_VALUE) {
-            throw new IllegalArgumentException("Attribute value must be finite and >= " + MIN_VALUE + ": " + value);
+            throw new IllegalArgumentException(
+                    "Attribute value must be finite and >= " + MIN_VALUE + ": " + value
+            );
         }
     }
 
