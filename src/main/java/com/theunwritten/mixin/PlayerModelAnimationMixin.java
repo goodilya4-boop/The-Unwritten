@@ -7,6 +7,7 @@ import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.client.entity.animation.json.AnimationHolder;
 import net.neoforged.neoforge.client.entity.animation.json.AnimationLoader;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,6 +31,14 @@ public abstract class PlayerModelAnimationMixin {
     private static final ResourceLocation THEUNWRITTEN_WALK =
             ResourceLocation.fromNamespaceAndPath("theunwritten", "movement/walk");
 
+    @Unique
+    private static final AnimationHolder THEUNWRITTEN_IDLE_ANIMATION =
+            AnimationLoader.INSTANCE.getAnimationHolder(THEUNWRITTEN_IDLE);
+
+    @Unique
+    private static final AnimationHolder THEUNWRITTEN_WALK_ANIMATION =
+            AnimationLoader.INSTANCE.getAnimationHolder(THEUNWRITTEN_WALK);
+
     @Inject(method = "setupAnim", at = @At("TAIL"))
     private void theunwritten$applyMovementAnimation(
             LivingEntity entity,
@@ -50,14 +59,14 @@ public abstract class PlayerModelAnimationMixin {
         switch (state) {
             case IDLE -> KeyframeAnimations.animate(
                     model,
-                    AnimationLoader.INSTANCE.getAnimation(THEUNWRITTEN_IDLE),
+                    THEUNWRITTEN_IDLE_ANIMATION.get(),
                     Math.round(ageInTicks * 50.0F),
                     1.0F,
                     THEUNWRITTEN_ANIMATION_CACHE
             );
             case WALK -> KeyframeAnimations.animate(
                     model,
-                    AnimationLoader.INSTANCE.getAnimation(THEUNWRITTEN_WALK),
+                    THEUNWRITTEN_WALK_ANIMATION.get(),
                     Math.round(limbSwing * 50.0F),
                     Math.min(limbSwingAmount, 1.0F),
                     THEUNWRITTEN_ANIMATION_CACHE
