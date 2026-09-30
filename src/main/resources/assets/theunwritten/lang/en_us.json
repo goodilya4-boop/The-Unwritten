@@ -1,0 +1,12 @@
+{
+  "itemGroup.theunwritten": "The Unwritten Tab",
+  "block.theunwritten.example_block": "Example Block",
+  "item.theunwritten.example_item": "Example Item",
+  "theunwritten.configuration.title": "The Unwritten Configs",
+  "theunwritten.configuration.section.theunwritten.common.toml": "The Unwritten Configs",
+  "theunwritten.configuration.section.theunwritten.common.toml.title": "The Unwritten Configs",
+  "theunwritten.configuration.items": "Item List",
+  "theunwritten.configuration.logDirtBlock": "Log Dirt Block",
+  "theunwritten.configuration.magicNumberIntroduction": "Magic Number Text",
+  "theunwritten.configuration.magicNumber": "Magic Number"
+}
