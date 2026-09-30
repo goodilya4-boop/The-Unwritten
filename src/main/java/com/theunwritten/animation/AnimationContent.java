@@ -13,6 +13,9 @@ public final class AnimationContent {
     public static final AnimationDefinition MOVEMENT_CROUCH_WALK =
             AnimationApi.definition("movement/crouch_walk", 20, true, AnimationLayer.MOVEMENT);
 
+    public static final AnimationDefinition MOVEMENT_RUN =
+            AnimationApi.definition("movement/run", 12, true, AnimationLayer.MOVEMENT, 5, true);
+
     public static final AnimationDefinition IMPERIAL_STANCE =
             AnimationApi.definition("imperial_fencing/stance", 30, true, AnimationLayer.COMBAT, 10, true);
 
