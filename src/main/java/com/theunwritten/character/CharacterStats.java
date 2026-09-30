@@ -29,13 +29,13 @@ public final class CharacterStats {
 
         EnumMap<StatType, Double> stats = new EnumMap<>(StatType.class);
 
-        stats.put(StatType.MAX_HEALTH, 100.0D + e * 9.0D + s * 2.0D);
+        stats.put(StatType.MAX_HEALTH, 20.0D + e * 1.0D + s * 0.5D);
         stats.put(StatType.HEALTH_REGEN, 0.5D + e * 0.04D + w * 0.02D);
-        stats.put(StatType.MAX_STAMINA, 100.0D + e * 5.0D + d * 2.0D);
+        stats.put(StatType.MAX_STAMINA, 20.0D + e * 1.0D + d * 0.5D);
         stats.put(StatType.STAMINA_REGEN, 4.0D + e * 0.08D + d * 0.04D);
-        stats.put(StatType.MAX_MANA, 100.0D + w * 5.0D + i * 3.0D);
+        stats.put(StatType.MAX_MANA, 20.0D + w * 1.0D + i * 0.5D);
         stats.put(StatType.MANA_REGEN, 2.0D + w * 0.04D + i * 0.05D);
-        stats.put(StatType.MAX_FOCUS, 100.0D + w * 4.0D + i * 2.0D);
+        stats.put(StatType.MAX_FOCUS, 20.0D + w * 0.75D + i * 0.25D);
         stats.put(StatType.FOCUS_REGEN, 3.0D + w * 0.05D + p * 0.03D);
 
         stats.put(StatType.PHYSICAL_POWER, s + e * 0.25D);
