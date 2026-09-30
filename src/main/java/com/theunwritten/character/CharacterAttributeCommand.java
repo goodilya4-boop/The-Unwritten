@@ -27,28 +27,32 @@ public final class CharacterAttributeCommand {
     public static void register(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
+        var setCommand = Commands.literal("set")
+                .then(Commands.argument("attribute", StringArgumentType.word())
+                        .suggests(ATTRIBUTE_SUGGESTIONS)
+                        .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0D))
+                                .executes(context -> set(
+                                        context.getSource(),
+                                        StringArgumentType.getString(context, "attribute"),
+                                        DoubleArgumentType.getDouble(context, "value")
+                                ))));
+
+        var addCommand = Commands.literal("add")
+                .then(Commands.argument("attribute", StringArgumentType.word())
+                        .suggests(ATTRIBUTE_SUGGESTIONS)
+                        .then(Commands.argument("amount", DoubleArgumentType.doubleArg())
+                                .executes(context -> add(
+                                        context.getSource(),
+                                        StringArgumentType.getString(context, "attribute"),
+                                        DoubleArgumentType.getDouble(context, "amount")
+                                ))));
+
         dispatcher.register(Commands.literal("attributes")
                 .executes(context -> show(context.getSource()))
                 .then(Commands.literal("show")
                         .executes(context -> show(context.getSource())))
-                .then(Commands.literal("set")
-                        .then(Commands.argument("attribute", StringArgumentType.word())
-                                .suggests(ATTRIBUTE_SUGGESTIONS)
-                                .then(Commands.argument("value", DoubleArgumentType.doubleArg(0.0D))
-                                        .executes(context -> set(
-                                                context.getSource(),
-                                                StringArgumentType.getString(context, "attribute"),
-                                                DoubleArgumentType.getDouble(context, "value")
-                                        )))))
-                .then(Commands.literal("add")
-                        .then(Commands.argument("attribute", StringArgumentType.word())
-                                .suggests(ATTRIBUTE_SUGGESTIONS)
-                                .then(Commands.argument("amount", DoubleArgumentType.doubleArg())
-                                        .executes(context -> add(
-                                                context.getSource(),
-                                                StringArgumentType.getString(context, "attribute"),
-                                                DoubleArgumentType.getDouble(context, "amount")
-                                        ))));
+                .then(setCommand)
+                .then(addCommand));
     }
 
     private static int show(CommandSourceStack source) {
