@@ -2,17 +2,15 @@ package com.theunwritten.animation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.theunwritten.TheUnwritten;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -20,12 +18,12 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RenderPlayerEvent;
 
 @EventBusSubscriber(
-        modid = com.theunwritten.TheUnwritten.MODID,
+        modid = TheUnwritten.MODID,
         value = Dist.CLIENT,
         bus = EventBusSubscriber.Bus.MOD
 )
-public final class MovementAnimationLayer extends RenderLayer<LivingEntity, PlayerModel<LivingEntity>> {
-    private final PlayerModel<LivingEntity> model;
+public final class MovementAnimationLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
+    private final PlayerModel<AbstractClientPlayer> model;
 
     private MovementAnimationLayer(PlayerRenderer renderer) {
         super(renderer);
@@ -41,12 +39,28 @@ public final class MovementAnimationLayer extends RenderLayer<LivingEntity, Play
         }
     }
 
+    @SubscribeEvent
+    public static void onRenderPlayerPre(RenderPlayerEvent.Pre event) {
+        hideMovementParts(event.getRenderer().getModel());
+    }
+
+    private static void hideMovementParts(PlayerModel<?> model) {
+        model.rightArm.visible = false;
+        model.leftArm.visible = false;
+        model.rightLeg.visible = false;
+        model.leftLeg.visible = false;
+        model.rightSleeve.visible = false;
+        model.leftSleeve.visible = false;
+        model.rightPants.visible = false;
+        model.leftPants.visible = false;
+    }
+
     @Override
     public void render(
             PoseStack poseStack,
             MultiBufferSource buffer,
             int packedLight,
-            LivingEntity entity,
+            AbstractClientPlayer player,
             float limbSwing,
             float limbSwingAmount,
             float partialTick,
@@ -54,39 +68,46 @@ public final class MovementAnimationLayer extends RenderLayer<LivingEntity, Play
             float netHeadYaw,
             float headPitch
     ) {
-        if (!(entity instanceof Player player)) {
-            return;
-        }
-
         MovementAnimationState state = resolveState(player);
         if (state == MovementAnimationState.IDLE) {
+            restoreMovementParts();
             return;
         }
 
-        model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        model.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        applyPose(state, limbSwing + partialTick, limbSwingAmount);
 
-        float phase = limbSwing + partialTick * 0.25F;
-        applyPose(state, phase, limbSwingAmount);
-
-        ResourceLocation texture = player instanceof net.minecraft.client.player.AbstractClientPlayer clientPlayer
-                ? clientPlayer.getSkinTextureLocation()
-                : null;
-
-        if (texture == null) {
-            return;
-        }
-
-        VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(texture));
+        VertexConsumer vertexConsumer =
+                buffer.getBuffer(RenderType.entityCutoutNoCull(player.getSkinTextureLocation()));
 
         poseStack.pushPose();
+
+        model.rightArm.visible = true;
+        model.leftArm.visible = true;
+        model.rightLeg.visible = true;
+        model.leftLeg.visible = true;
+
         model.rightArm.render(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
         model.leftArm.render(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
         model.rightLeg.render(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
         model.leftLeg.render(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+
         poseStack.popPose();
+        restoreMovementParts();
     }
 
-    private static MovementAnimationState resolveState(Player player) {
+    private void restoreMovementParts() {
+        model.rightArm.visible = false;
+        model.leftArm.visible = false;
+        model.rightLeg.visible = false;
+        model.leftLeg.visible = false;
+        model.rightSleeve.visible = false;
+        model.leftSleeve.visible = false;
+        model.rightPants.visible = false;
+        model.leftPants.visible = false;
+    }
+
+    private static MovementAnimationState resolveState(AbstractClientPlayer player) {
         boolean crouching = player.isCrouching();
         boolean moving = player.getDeltaMovement().horizontalDistanceSqr() > 0.0001D;
         boolean running = moving && player.isSprinting();
@@ -102,37 +123,12 @@ public final class MovementAnimationLayer extends RenderLayer<LivingEntity, Play
         return moving ? MovementAnimationState.WALK : MovementAnimationState.IDLE;
     }
 
-    private static void applyPose(
+    private void applyPose(
             MovementAnimationState state,
             float phase,
             float limbSwingAmount
     ) {
         float amount = Mth.clamp(limbSwingAmount, 0.0F, 1.0F);
-        float legSwing;
-        float armSwing;
-
-        switch (state) {
-            case WALK -> {
-                legSwing = 0.65F;
-                armSwing = 0.35F;
-            }
-            case RUN -> {
-                legSwing = 1.0F;
-                armSwing = 0.65F;
-            }
-            case CROUCH_WALK -> {
-                legSwing = 0.45F;
-                armSwing = 0.20F;
-            }
-            case CROUCH -> {
-                legSwing = 0.0F;
-                armSwing = 0.0F;
-            }
-            default -> {
-                legSwing = 0.0F;
-                armSwing = 0.0F;
-            }
-        }
 
         if (state == MovementAnimationState.CROUCH) {
             model.rightLeg.xRot = -0.35F;
@@ -142,22 +138,36 @@ public final class MovementAnimationLayer extends RenderLayer<LivingEntity, Play
             return;
         }
 
-        float cycle = Mth.cos(phase * (state == MovementAnimationState.RUN ? 1.35F : 1.0F));
-        float opposite = Mth.cos(phase * (state == MovementAnimationState.RUN ? 1.35F : 1.0F) + Mth.PI);
+        float speed = state == MovementAnimationState.RUN ? 1.35F : 1.0F;
+        float legAmplitude = switch (state) {
+            case WALK -> 0.65F;
+            case RUN -> 1.0F;
+            case CROUCH_WALK -> 0.45F;
+            default -> 0.0F;
+        };
+        float armAmplitude = switch (state) {
+            case WALK -> 0.35F;
+            case RUN -> 0.65F;
+            case CROUCH_WALK -> 0.20F;
+            default -> 0.0F;
+        };
 
-        model.rightLeg.xRot += cycle * legSwing * amount;
-        model.leftLeg.xRot += opposite * legSwing * amount;
-        model.rightArm.xRot += opposite * armSwing * amount;
-        model.leftArm.xRot += cycle * armSwing * amount;
+        float cycle = Mth.cos(phase * speed);
+        float opposite = Mth.cos(phase * speed + Mth.PI);
+
+        model.rightLeg.xRot += cycle * legAmplitude * amount;
+        model.leftLeg.xRot += opposite * legAmplitude * amount;
+        model.rightArm.xRot += opposite * armAmplitude * amount;
+        model.leftArm.xRot += cycle * armAmplitude * amount;
 
         if (state == MovementAnimationState.CROUCH_WALK) {
-            model.body.xRot = 0.15F;
             model.rightLeg.xRot -= 0.20F;
             model.leftLeg.xRot -= 0.20F;
+            model.rightArm.xRot += 0.15F;
+            model.leftArm.xRot += 0.15F;
         }
 
         if (state == MovementAnimationState.RUN) {
-            model.body.xRot = 0.12F;
             model.rightArm.xRot += 0.20F;
             model.leftArm.xRot += 0.20F;
         }
