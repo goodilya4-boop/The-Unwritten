@@ -39,9 +39,19 @@ public final class MovementAnimationLayer extends RenderLayer<AbstractClientPlay
         }
     }
 
-    @SubscribeEvent
-    public static void onRenderPlayerPre(RenderPlayerEvent.Pre event) {
-        hideMovementParts(event.getRenderer().getModel());
+    @EventBusSubscriber(
+            modid = TheUnwritten.MODID,
+            value = Dist.CLIENT,
+            bus = EventBusSubscriber.Bus.GAME
+    )
+    public static final class ClientEvents {
+        private ClientEvents() {
+        }
+
+        @SubscribeEvent
+        public static void onRenderPlayerPre(RenderPlayerEvent.Pre event) {
+            hideMovementParts(event.getRenderer().getModel());
+        }
     }
 
     private static void hideMovementParts(PlayerModel<?> model) {
