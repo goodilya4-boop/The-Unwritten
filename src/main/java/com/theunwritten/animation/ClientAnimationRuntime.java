@@ -19,6 +19,7 @@ import org.lwjgl.glfw.GLFW;
 )
 public final class ClientAnimationRuntime {
     private static final AnimationController CONTROLLER = new AnimationController();
+    private static final AnimationStateMachine STATE_MACHINE = new AnimationStateMachine();
 
     private static final KeyMapping TEST_ANIMATION = new KeyMapping(
             "key.theunwritten.test_animation",
@@ -46,11 +47,36 @@ public final class ClientAnimationRuntime {
 
         @SubscribeEvent
         public static void onClientTick(ClientTickEvent.Post event) {
+            Minecraft minecraft = Minecraft.getInstance();
+
+            if (minecraft.player != null) {
+                updateMovement(minecraft);
+            }
+
             while (TEST_ANIMATION.consumeClick()) {
                 playTestAnimation();
             }
 
             CONTROLLER.tick();
+        }
+
+        private static void updateMovement(Minecraft minecraft) {
+            if (!STATE_MACHINE.update(minecraft.player)) {
+                return;
+            }
+
+            AnimationDefinition definition = switch (STATE_MACHINE.movementState()) {
+                case IDLE -> AnimationContent.IMPERIAL_IDLE;
+                case WALK -> AnimationContent.MOVEMENT_WALK;
+                case CROUCH -> AnimationContent.MOVEMENT_CROUCH;
+                case CROUCH_WALK -> AnimationContent.MOVEMENT_CROUCH_WALK;
+            };
+
+            CONTROLLER.play(definition);
+            minecraft.player.displayClientMessage(
+                    Component.literal("Movement animation: " + definition.id()),
+                    true
+            );
         }
 
         private static void playTestAnimation() {
