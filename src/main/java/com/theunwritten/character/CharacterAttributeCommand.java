@@ -94,6 +94,7 @@ public final class CharacterAttributeCommand {
 
         CharacterData data = player.getData(CharacterAttachments.CHARACTER_DATA);
         data.attributes().set(type, value);
+        CharacterStatSync.apply(player);
 
         source.sendSuccess(() -> Component.literal(
                 "Set " + type.name() + " to " + format(value)), true);
@@ -114,6 +115,7 @@ public final class CharacterAttributeCommand {
 
         CharacterData data = player.getData(CharacterAttachments.CHARACTER_DATA);
         data.attributes().add(type, amount);
+        CharacterStatSync.apply(player);
         double value = data.attributes().get(type);
 
         source.sendSuccess(() -> Component.literal(
