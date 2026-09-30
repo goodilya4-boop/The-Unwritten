@@ -1,7 +1,6 @@
 package com.theunwritten.client;
 
-import com.theunwritten.character.CharacterAttachments;
-import com.theunwritten.character.CharacterData;
+import com.theunwritten.network.ResourceSyncClient;
 import com.theunwritten.character.ResourceType;
 import com.theunwritten.character.StatType;
 import net.minecraft.client.Minecraft;
@@ -12,7 +11,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 
-import java.util.Map;
 
 @EventBusSubscriber(modid = "theunwritten", bus = Bus.GAME, value = Dist.CLIENT)
 public final class CharacterHud {
@@ -32,17 +30,14 @@ public final class CharacterHud {
             return;
         }
 
-        CharacterData data = minecraft.player.getData(CharacterAttachments.CHARACTER_DATA);
-        Map<StatType, Double> stats = data.stats();
-
         int x = LEFT;
         int y = event.getGuiGraphics().guiHeight() - BOTTOM - (BAR_HEIGHT * 3 + GAP * 2);
 
-        drawBar(event.getGuiGraphics(), x, y, data.resources().ratio(ResourceType.HEALTH, stats), "♥", "Health");
+        drawBar(event.getGuiGraphics(), x, y, ResourceSyncClient.ratio(ResourceType.HEALTH), "♥", "Health");
         y += BAR_HEIGHT + GAP;
-        drawBar(event.getGuiGraphics(), x, y, data.resources().ratio(ResourceType.MANA, stats), "◆", "Mana");
+        drawBar(event.getGuiGraphics(), x, y, ResourceSyncClient.ratio(ResourceType.MANA), "◆", "Mana");
         y += BAR_HEIGHT + GAP;
-        drawBar(event.getGuiGraphics(), x, y, data.resources().ratio(ResourceType.STAMINA, stats), "◇", "Stamina");
+        drawBar(event.getGuiGraphics(), x, y, ResourceSyncClient.ratio(ResourceType.STAMINA), "◇", "Stamina");
     }
 
     private static void drawBar(
