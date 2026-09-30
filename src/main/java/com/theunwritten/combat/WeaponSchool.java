@@ -1,6 +1,6 @@
 package com.theunwritten.combat;
 
-import java.util.EnumSet;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
@@ -16,7 +16,7 @@ public record WeaponSchool(
         if (id.isBlank() || name.isBlank()) {
             throw new IllegalArgumentException("School id and name must not be blank");
         }
-        supportedWeapons = Set.copyOf(EnumSet.copyOf(supportedWeapons));
+        supportedWeapons = Set.copyOf(supportedWeapons);
     }
 
     public boolean supports(WeaponType weapon) {
