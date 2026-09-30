@@ -12,10 +12,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerModel.class)
-public abstract class PlayerModelAnimationMixin<T extends LivingEntity> {
+public abstract class PlayerModelAnimationMixin {
     @Inject(method = "setupAnim", at = @At("TAIL"))
     private void theunwritten$applyMovementAnimation(
-            T entity,
+            LivingEntity entity,
             float limbSwing,
             float limbSwingAmount,
             float ageInTicks,
