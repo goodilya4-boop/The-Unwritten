@@ -24,20 +24,23 @@ public class CustomMainMenuScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void render(
+            GuiGraphics guiGraphics,
+            int mouseX,
+            int mouseY,
+            float partialTick
+    ) {
         guiGraphics.blit(
                 BACKGROUND,
                 0,
                 0,
                 0,
                 0,
-                this.width,
-                this.height,
-                this.width,
-                this.height
+                width,
+                height,
+                width,
+                height
         );
-
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
