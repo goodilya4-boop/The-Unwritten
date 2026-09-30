@@ -2,7 +2,6 @@ package com.theunwritten.character;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 public final class CharacterRuntimeEvents {
