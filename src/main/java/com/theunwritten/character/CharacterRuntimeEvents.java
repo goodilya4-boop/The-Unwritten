@@ -28,6 +28,7 @@ public final class CharacterRuntimeEvents {
 
             data.resources().regenerate(stats);
             CharacterStatSync.apply(player);
+            com.theunwritten.network.ResourceSyncServer.send(player);
 
             double resourceHealth = data.resources().current(ResourceType.HEALTH);
             if (player.getHealth() > 0.0F && Math.abs(player.getHealth() - resourceHealth) > 0.001D) {
@@ -40,6 +41,7 @@ public final class CharacterRuntimeEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             CharacterStatSync.apply(player);
             initializeHealthResource(player);
+            com.theunwritten.network.ResourceSyncServer.send(player);
         }
     }
 
