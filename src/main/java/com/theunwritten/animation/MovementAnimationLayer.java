@@ -88,7 +88,7 @@ public final class MovementAnimationLayer extends RenderLayer<AbstractClientPlay
         applyPose(state, limbSwing + partialTick, limbSwingAmount);
 
         VertexConsumer vertexConsumer =
-                buffer.getBuffer(RenderType.entityCutoutNoCull(player.getSkinTextureLocation()));
+                buffer.getBuffer(RenderType.entityCutoutNoCull(player.getSkin().texture()));
 
         poseStack.pushPose();
 
