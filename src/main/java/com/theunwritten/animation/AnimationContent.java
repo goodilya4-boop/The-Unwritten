@@ -4,6 +4,15 @@ public final class AnimationContent {
     public static final AnimationDefinition IMPERIAL_IDLE =
             AnimationApi.definition("imperial_fencing/idle", 40, true, AnimationLayer.MOVEMENT);
 
+    public static final AnimationDefinition MOVEMENT_WALK =
+            AnimationApi.definition("movement/walk", 20, true, AnimationLayer.MOVEMENT);
+
+    public static final AnimationDefinition MOVEMENT_CROUCH =
+            AnimationApi.definition("movement/crouch", 20, true, AnimationLayer.MOVEMENT);
+
+    public static final AnimationDefinition MOVEMENT_CROUCH_WALK =
+            AnimationApi.definition("movement/crouch_walk", 20, true, AnimationLayer.MOVEMENT);
+
     public static final AnimationDefinition IMPERIAL_STANCE =
             AnimationApi.definition("imperial_fencing/stance", 30, true, AnimationLayer.COMBAT, 10, true);
 
