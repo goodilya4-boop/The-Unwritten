@@ -7,7 +7,7 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 import java.util.Arrays;
 
 public final class Attributes implements INBTSerializable<CompoundTag> {
-    public static final double DEFAULT_VALUE = 20.0D;
+    public static final double DEFAULT_VALUE = 5.0D;
     public static final double MIN_VALUE = 0.0D;
 
     private static final String NBT_PREFIX = "attribute_";
