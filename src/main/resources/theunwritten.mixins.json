@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.theunwritten.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "PlayerModelAnimationMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
