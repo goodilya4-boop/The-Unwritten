@@ -8,11 +8,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 public final class CharacterAttributeCommand {
     private CharacterAttributeCommand() {
@@ -50,7 +48,7 @@ public final class CharacterAttributeCommand {
                                                 context.getSource(),
                                                 StringArgumentType.getString(context, "attribute"),
                                                 DoubleArgumentType.getDouble(context, "amount")
-                                        )))));
+                                        ))));
     }
 
     private static int show(CommandSourceStack source) {
