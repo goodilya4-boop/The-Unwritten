@@ -1,0 +1,31 @@
+package com.theunwritten.knowledge;
+
+import com.theunwritten.character.AttributeType;
+
+import java.util.Set;
+
+public final class KnowledgeContent {
+    public static final String IMPERIAL_FENCING = "combat.school.imperial_fencing";
+
+    public static final KnowledgeNode IMPERIAL_FENCING_NODE = new KnowledgeNode(
+            IMPERIAL_FENCING,
+            "Imperial Fencing",
+            "combat",
+            1,
+            Set.of(),
+            java.util.List.of(
+                    new MinimumAttributeRequirement(AttributeType.DEX, 20.0D),
+                    new MinimumAttributeRequirement(AttributeType.PER, 20.0D)
+            ),
+            java.util.List.of(
+                    new KnowledgeUnlock("weapon_school:" + ImperialSchoolIds.IMPERIAL_FENCING)
+            )
+    );
+
+    private KnowledgeContent() {
+    }
+
+    private static final class ImperialSchoolIds {
+        private static final String IMPERIAL_FENCING = "imperial_fencing";
+    }
+}
