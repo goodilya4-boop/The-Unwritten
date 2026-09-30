@@ -7,11 +7,11 @@ import com.theunwritten.character.StatType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-import java.util.EnumMap;
 import java.util.Map;
 
-public final class ResourceSyncPacket {
+public final class ResourceSyncPacket implements CustomPacketPayload {
     private final double[] current;
     private final double[] maximum;
 
@@ -56,5 +56,10 @@ public final class ResourceSyncPacket {
             maximum[type.ordinal()] = data.resources().max(type, stats);
         }
         return new ResourceSyncPacket(current, maximum);
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TheUnwrittenNetwork.RESOURCE_SYNC_TYPE;
     }
 }
