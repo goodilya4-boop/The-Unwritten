@@ -10,25 +10,49 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.EventBusSubscriber.Bus;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
 @EventBusSubscriber(modid = TheUnwritten.MODID, bus = Bus.GAME, value = Dist.CLIENT)
 public final class CharacterHud {
-    private static final ResourceLocation PANEL =
-            ResourceLocation.fromNamespaceAndPath(
-                    TheUnwritten.MODID,
-                    "textures/gui/button.png"
-            );
+    private static final ResourceLocation HEALTH = texture("health_empty.png");
+    private static final ResourceLocation MANA = texture("mana_empty.png");
+    private static final ResourceLocation STAMINA = texture("stamina_empty.png");
+    private static final ResourceLocation ENERGY = texture("energy_empty.png");
+    private static final ResourceLocation EXPERIENCE = texture("experience_empty.png");
+    private static final ResourceLocation LEVEL = texture("level_diamond_empty.png");
+    private static final ResourceLocation ARMOR = texture("armor_indicator_empty.png");
+    private static final ResourceLocation HUNGER = texture("hunger_indicator_empty.png");
 
-    private static final int PANEL_WIDTH = 180;
-    private static final int PANEL_HEIGHT = 24;
-    private static final int BAR_WIDTH = 116;
-    private static final int BAR_HEIGHT = 7;
-    private static final int GAP = 4;
-    private static final int LEFT = 12;
-    private static final int BOTTOM = 12;
+    private static final int BAR_WIDTH = 84;
+    private static final int BAR_HEIGHT = 12;
+    private static final int BAR_GAP = 8;
+    private static final int LEVEL_SIZE = 24;
+    private static final int XP_WIDTH = 184;
+    private static final int XP_HEIGHT = 8;
+    private static final int SIDE_SIZE = 20;
 
     private CharacterHud() {
+    }
+
+    private static ResourceLocation texture(String name) {
+        return ResourceLocation.fromNamespaceAndPath(
+                TheUnwritten.MODID,
+                "textures/gui/" + name
+        );
+    }
+
+    @SubscribeEvent
+    public static void hideVanillaLayers(RenderGuiLayerEvent.Pre event) {
+        ResourceLocation name = event.getName();
+        if (name.equals(VanillaGuiLayers.PLAYER_HEALTH)
+                || name.equals(VanillaGuiLayers.ARMOR_LEVEL)
+                || name.equals(VanillaGuiLayers.FOOD_LEVEL)
+                || name.equals(VanillaGuiLayers.EXPERIENCE_BAR)
+                || name.equals(VanillaGuiLayers.EXPERIENCE_LEVEL)) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent
@@ -39,84 +63,100 @@ public final class CharacterHud {
         }
 
         GuiGraphics graphics = event.getGuiGraphics();
-        int x = LEFT;
-        int y = graphics.guiHeight() - BOTTOM - (PANEL_HEIGHT * 3 + GAP * 2);
+        int width = graphics.guiWidth();
+        int height = graphics.guiHeight();
+        int centerX = width / 2;
 
-        drawResource(graphics, x, y, ResourceType.HEALTH, "♥", "Здоровье", 0xFFB83A3A);
-        y += PANEL_HEIGHT + GAP;
-        drawResource(graphics, x, y, ResourceType.MANA, "◆", "Мана", 0xFF4A72B8);
-        y += PANEL_HEIGHT + GAP;
-        drawResource(graphics, x, y, ResourceType.STAMINA, "◇", "Выносливость", 0xFFB89A3A);
+        // Same bottom HUD area as vanilla health, hunger and experience.
+        int topY = height - 62;
+        int bottomY = topY + BAR_HEIGHT + 7;
+
+        int leftBarX = centerX - LEVEL_SIZE / 2 - BAR_GAP - BAR_WIDTH;
+        int rightBarX = centerX + LEVEL_SIZE / 2 + BAR_GAP;
+
+        // Top: mana / energy.
+        drawResourceBar(graphics, leftBarX, topY, BAR_WIDTH, BAR_HEIGHT,
+                MANA, ResourceType.MANA, 0xFF4D75D1);
+        drawResourceBar(graphics, rightBarX, topY, BAR_WIDTH, BAR_HEIGHT,
+                ENERGY, ResourceType.FOCUS, 0xFFD0A13A);
+
+        // Bottom: health / stamina.
+        drawResourceBar(graphics, leftBarX, bottomY, BAR_WIDTH, BAR_HEIGHT,
+                HEALTH, ResourceType.HEALTH, 0xFFB83A3A);
+        drawResourceBar(graphics, rightBarX, bottomY, BAR_WIDTH, BAR_HEIGHT,
+                STAMINA, ResourceType.STAMINA, 0xFFB88A3A);
+
+        // Level diamond in the center.
+        int levelX = centerX - LEVEL_SIZE / 2;
+        int levelY = topY - 1;
+        graphics.blit(LEVEL, levelX, levelY, 0, 0, LEVEL_SIZE, LEVEL_SIZE, LEVEL_SIZE, LEVEL_SIZE);
+
+        String levelText = Integer.toString(minecraft.player.experienceLevel);
+        int levelTextX = centerX - minecraft.font.width(levelText) / 2;
+        graphics.drawString(minecraft.font, levelText, levelTextX, levelY + 8, 0xFFFFFFFF, true);
+
+        // Experience below the whole resource cluster.
+        int xpX = centerX - XP_WIDTH / 2;
+        int xpY = bottomY + BAR_HEIGHT + 5;
+        drawExperienceBar(graphics, minecraft, xpX, xpY);
+
+        // Armor / hunger indicators flank the resource cluster.
+        int sideY = topY + (LEVEL_SIZE - SIDE_SIZE) / 2;
+        int armorX = leftBarX - SIDE_SIZE - 7;
+        int hungerX = rightBarX + BAR_WIDTH + 7;
+
+        drawSideIndicator(graphics, minecraft, armorX, sideY, ARMOR, minecraft.player.getArmorValue());
+        drawSideIndicator(graphics, minecraft, hungerX, sideY, HUNGER, minecraft.player.getFoodData().getFoodLevel());
     }
 
-    private static void drawResource(
+    private static void drawResourceBar(
             GuiGraphics graphics,
             int x,
             int y,
+            int width,
+            int height,
+            ResourceLocation texture,
             ResourceType type,
-            String icon,
-            String label,
             int fillColor
     ) {
         double ratio = Math.max(0.0D, Math.min(1.0D, ResourceSyncClient.ratio(type)));
-        int fillWidth = (int) Math.round(ratio * BAR_WIDTH);
-
-        // Тот же материал, что используется у кнопок главного меню.
-        graphics.blit(
-                PANEL,
-                x,
-                y,
-                0,
-                0,
-                PANEL_WIDTH,
-                PANEL_HEIGHT,
-                PANEL_WIDTH,
-                PANEL_HEIGHT
-        );
-
-        Minecraft minecraft = Minecraft.getInstance();
-
-        int textX = x + 8;
-        int barX = x + 8;
-        int barY = y + 13;
-
-        graphics.drawString(
-                minecraft.font,
-                icon,
-                textX,
-                y + 4,
-                0xFFFFFFFF
-        );
-
-        graphics.drawString(
-                minecraft.font,
-                label,
-                textX + 12,
-                y + 4,
-                0xFFFFFFFF
-        );
-
-        // Внутренняя рамка ресурса.
-        graphics.fill(
-                barX,
-                barY,
-                barX + BAR_WIDTH,
-                barY + BAR_HEIGHT,
-                0xAA000000
-        );
+        int fillWidth = (int) Math.round(ratio * width);
 
         if (fillWidth > 0) {
-            graphics.fill(
-                    barX,
-                    barY,
-                    barX + fillWidth,
-                    barY + BAR_HEIGHT,
-                    fillColor
-            );
+            graphics.fill(x, y, x + fillWidth, y + height, fillColor);
         }
 
-        // Тонкий светлый кант, чтобы полосы визуально совпадали с UI кнопок.
-        graphics.fill(barX, barY, barX + BAR_WIDTH, barY + 1, 0x55FFFFFF);
-        graphics.fill(barX, barY + BAR_HEIGHT - 1, barX + BAR_WIDTH, barY + BAR_HEIGHT, 0x33000000);
+        graphics.blit(texture, x, y, 0, 0, width, height, width, height);
+    }
+
+    private static void drawExperienceBar(
+            GuiGraphics graphics,
+            Minecraft minecraft,
+            int x,
+            int y
+    ) {
+        double progress = Math.max(0.0D, Math.min(1.0D, minecraft.player.experienceProgress));
+        int fillWidth = (int) Math.round(progress * XP_WIDTH);
+
+        if (fillWidth > 0) {
+            graphics.fill(x, y, x + fillWidth, y + XP_HEIGHT, 0xFF5FBF45);
+        }
+
+        graphics.blit(EXPERIENCE, x, y, 0, 0, XP_WIDTH, XP_HEIGHT, XP_WIDTH, XP_HEIGHT);
+    }
+
+    private static void drawSideIndicator(
+            GuiGraphics graphics,
+            Minecraft minecraft,
+            int x,
+            int y,
+            ResourceLocation texture,
+            int value
+    ) {
+        graphics.blit(texture, x, y, 0, 0, SIDE_SIZE, SIDE_SIZE, SIDE_SIZE, SIDE_SIZE);
+
+        String text = Integer.toString(value);
+        int textX = x + SIDE_SIZE / 2 - minecraft.font.width(text) / 2;
+        graphics.drawString(minecraft.font, text, textX, y + 6, 0xFFFFFFFF, true);
     }
 }
