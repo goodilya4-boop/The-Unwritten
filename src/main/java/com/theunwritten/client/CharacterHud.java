@@ -17,14 +17,28 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 @EventBusSubscriber(modid = TheUnwritten.MODID, bus = Bus.GAME, value = Dist.CLIENT)
 public final class CharacterHud {
     private static final int BAR_WIDTH = 150;
-    private static final int BAR_HEIGHT = 18;
+    private static final int BAR_HEIGHT = 16;
     private static final int BAR_GAP = 8;
-    private static final int LEVEL_WIDTH = 42;
-    private static final int LEVEL_HEIGHT = 42;
+    private static final int LEVEL_SIZE = 46;
     private static final int XP_WIDTH = 230;
-    private static final int XP_HEIGHT = 10;
-    private static final int SIDE_WIDTH = 28;
-    private static final int SIDE_HEIGHT = 58;
+    private static final int XP_HEIGHT = 7;
+
+    // The Unwritten palette: dark iron UI with muted, readable resource accents.
+    private static final int PANEL_FILL = 0xF0141820;
+    private static final int PANEL_EDGE = 0xFF4A5360;
+    private static final int PANEL_SHADOW = 0xFF202731;
+    private static final int EMPTY_FILL = 0xFF2A313B;
+    private static final int TEXT_PRIMARY = 0xFFF0F0EA;
+    private static final int TEXT_SECONDARY = 0xFFB8BEC6;
+
+    private static final int ENERGY_COLOR = 0xFF4C86C6;
+    private static final int MANA_COLOR = 0xFFC09A55;
+    private static final int HEALTH_COLOR = 0xFFB84B4B;
+    private static final int STAMINA_COLOR = 0xFF5B9A62;
+    private static final int XP_COLOR = 0xFF9B8548;
+
+    private static final int ARMOR_COLOR = 0xFFB7C1CC;
+    private static final int HUNGER_COLOR = 0xFFC08B4A;
 
     private CharacterHud() {
     }
@@ -56,35 +70,35 @@ public final class CharacterHud {
         int topY = height - 62;
         int bottomY = topY + BAR_HEIGHT + 8;
 
-        int leftX = centerX - LEVEL_WIDTH / 2 - BAR_GAP - BAR_WIDTH;
-        int rightX = centerX + LEVEL_WIDTH / 2 + BAR_GAP;
+        int leftX = centerX - LEVEL_SIZE / 2 - BAR_GAP - BAR_WIDTH;
+        int rightX = centerX + LEVEL_SIZE / 2 + BAR_GAP;
 
         drawResourceBar(graphics, minecraft, leftX, topY, BAR_WIDTH, BAR_HEIGHT,
-                ResourceType.FOCUS, "ЭНЕРГИЯ", "✦", 0xFF318DFF);
+                ResourceType.FOCUS, "✦", ENERGY_COLOR);
         drawResourceBar(graphics, minecraft, rightX, topY, BAR_WIDTH, BAR_HEIGHT,
-                ResourceType.MANA, "МАНА", "◆", 0xFFE0AA35);
+                ResourceType.MANA, "◆", MANA_COLOR);
 
         drawResourceBar(graphics, minecraft, leftX, bottomY, BAR_WIDTH, BAR_HEIGHT,
-                ResourceType.HEALTH, "ЗДОРОВЬЕ", "♥", 0xFFE43F3F);
+                ResourceType.HEALTH, "♥", HEALTH_COLOR);
         drawResourceBar(graphics, minecraft, rightX, bottomY, BAR_WIDTH, BAR_HEIGHT,
-                ResourceType.STAMINA, "ВЫНОСЛИВОСТЬ", "✦", 0xFF49B957);
+                ResourceType.STAMINA, "✦", STAMINA_COLOR);
 
-        int levelX = centerX - LEVEL_WIDTH / 2;
-        int levelY = topY + (BAR_HEIGHT + 8) / 2 - LEVEL_HEIGHT / 2;
+        int levelX = centerX - LEVEL_SIZE / 2;
+        int levelY = topY + (BAR_HEIGHT + 8) / 2 - LEVEL_SIZE / 2;
         drawLevel(graphics, minecraft, levelX, levelY);
 
         int xpX = centerX - XP_WIDTH / 2;
-        int xpY = height - 25;
+        int xpY = height - 22;
         drawExperienceBar(graphics, minecraft, xpX, xpY);
 
-        int sideY = topY - 4;
-        int armorX = leftX - SIDE_WIDTH - 8;
+        int sideY = topY + 1;
+        int armorX = leftX - 22;
         int hungerX = rightX + BAR_WIDTH + 8;
 
-        drawSidePanel(graphics, minecraft, armorX, sideY, "БРОНЯ",
-                minecraft.player.getArmorValue(), 0xFFBFC9D6, true);
-        drawSidePanel(graphics, minecraft, hungerX, sideY, "ГОЛОД",
-                minecraft.player.getFoodData().getFoodLevel(), 0xFFE5A33D, false);
+        drawSideIndicator(graphics, armorX, sideY, minecraft.player.getArmorValue(),
+                ARMOR_COLOR, true);
+        drawSideIndicator(graphics, hungerX, sideY, minecraft.player.getFoodData().getFoodLevel(),
+                HUNGER_COLOR, false);
     }
 
     private static void drawResourceBar(
@@ -95,26 +109,26 @@ public final class CharacterHud {
             int width,
             int height,
             ResourceType type,
-            String label,
             String icon,
             int fillColor
     ) {
         double ratio = Math.max(0.0D, Math.min(1.0D, ResourceSyncClient.ratio(type)));
         int fillWidth = (int) Math.round((width - 8) * ratio);
 
-        drawBeveledPanel(graphics, x, y, width, height, 0xFF10151D, 0xFF667080);
+        drawBeveledPanel(graphics, x, y, width, height);
 
-        graphics.fill(x + 4, y + 4, x + 4 + fillWidth, y + height - 4, fillColor);
         if (fillWidth > 0) {
-            graphics.fill(x + 4, y + 4, x + 4 + fillWidth, y + 6, 0x55FFFFFF);
+            graphics.fill(x + 4, y + 4, x + 4 + fillWidth, y + height - 3, fillColor);
+            graphics.fill(x + 4, y + 4, x + 4 + fillWidth, y + 5, 0x45FFFFFF);
+        } else {
+            graphics.fill(x + 4, y + 4, x + width - 4, y + height - 3, EMPTY_FILL);
         }
 
-        graphics.drawString(minecraft.font, icon, x + 7, y + 3, 0xFFFFFFFF, true);
-        graphics.drawString(minecraft.font, label, x + 25, y + 3, 0xFFFFFFFF, true);
+        graphics.drawString(minecraft.font, icon, x + 7, y + 3, TEXT_PRIMARY, true);
 
         String value = formatResourceValue(type);
-        int valueX = x + width - minecraft.font.width(value) - 8;
-        graphics.drawString(minecraft.font, value, valueX, y + 3, 0xFFE7E7E7, true);
+        int valueX = x + width - minecraft.font.width(value) - 7;
+        graphics.drawString(minecraft.font, value, valueX, y + 3, TEXT_SECONDARY, true);
     }
 
     private static String formatResourceValue(ResourceType type) {
@@ -136,27 +150,39 @@ public final class CharacterHud {
             int x,
             int y
     ) {
-        int centerX = x + LEVEL_WIDTH / 2;
-        int centerY = y + LEVEL_HEIGHT / 2;
-        int[] widths = {8, 16, 24, 32, 38, 32, 24, 16, 8};
+        int centerX = x + LEVEL_SIZE / 2;
+        int centerY = y + LEVEL_SIZE / 2;
+
+        // A true pixel-art diamond: widest at the center, tapering evenly toward both points.
+        int[] widths = {6, 10, 14, 18, 22, 26, 30, 34, 38, 42, 38, 34, 30, 26, 22, 18, 14, 10, 6};
+        int rowHeight = 2;
 
         for (int i = 0; i < widths.length; i++) {
-            int rowY = y + i * 5 - 1;
+            int rowY = y + i * rowHeight;
             int rowX = centerX - widths[i] / 2;
-            graphics.fill(rowX, rowY, rowX + widths[i], rowY + 5, 0xFF121821);
+            int fill = (i == 0 || i == widths.length - 1)
+                    ? PANEL_EDGE
+                    : 0xFF151B23;
+
+            graphics.fill(rowX, rowY, rowX + widths[i], rowY + rowHeight, fill);
+
             if (i > 0 && i < widths.length - 1) {
-                graphics.fill(rowX, rowY, rowX + widths[i], rowY + 1, 0xFF657181);
+                graphics.fill(rowX, rowY, rowX + widths[i], rowY + 1, PANEL_EDGE);
             }
         }
 
         String level = Integer.toString(minecraft.player.experienceLevel);
         int levelX = centerX - minecraft.font.width(level) / 2;
-        graphics.drawString(minecraft.font, level, levelX, centerY - 6, 0xFFFFFFFF, true);
-        graphics.drawString(minecraft.font, "УРОВЕНЬ",
-                centerX - minecraft.font.width("УРОВЕНЬ") / 2,
+        graphics.drawString(minecraft.font, level, levelX, centerY - 6, TEXT_PRIMARY, true);
+
+        graphics.drawString(
+                minecraft.font,
+                "LVL",
+                centerX - minecraft.font.width("LVL") / 2,
                 centerY + 5,
-                0xFFBFC5CC,
-                true);
+                TEXT_SECONDARY,
+                true
+        );
     }
 
     private static void drawExperienceBar(
@@ -166,81 +192,75 @@ public final class CharacterHud {
             int y
     ) {
         double progress = Math.max(0.0D, Math.min(1.0D, minecraft.player.experienceProgress));
-        int fillWidth = (int) Math.round((XP_WIDTH - 8) * progress);
+        int fillWidth = (int) Math.round((XP_WIDTH - 6) * progress);
 
-        drawBeveledPanel(graphics, x, y, XP_WIDTH, XP_HEIGHT, 0xFF10151D, 0xFF667080);
+        drawBeveledPanel(graphics, x, y, XP_WIDTH, XP_HEIGHT);
+
+        graphics.fill(x + 3, y + 2, x + XP_WIDTH - 3, y + XP_HEIGHT - 2, EMPTY_FILL);
 
         if (fillWidth > 0) {
-            graphics.fill(x + 4, y + 3, x + 4 + fillWidth, y + XP_HEIGHT - 3, 0xFF58B84A);
-            graphics.fill(x + 4, y + 3, x + 4 + fillWidth, y + 4, 0x77FFFFFF);
+            graphics.fill(x + 3, y + 2, x + 3 + fillWidth, y + XP_HEIGHT - 2, XP_COLOR);
+            graphics.fill(x + 3, y + 2, x + 3 + fillWidth, y + 3, 0x55FFFFFF);
         }
-
-        graphics.drawString(minecraft.font, "ОПЫТ", x + 8, y + 1, 0xFFFFFFFF, true);
     }
 
-    private static void drawSidePanel(
+    private static void drawSideIndicator(
             GuiGraphics graphics,
-            Minecraft minecraft,
             int x,
             int y,
-            String title,
             int value,
-            int iconColor,
+            int color,
             boolean armor
     ) {
-        drawBeveledPanel(graphics, x, y, SIDE_WIDTH, SIDE_HEIGHT, 0xFF10151D, 0xFF667080);
-
-        int titleX = x + SIDE_WIDTH / 2 - minecraft.font.width(title) / 2;
-        graphics.drawString(minecraft.font, title, titleX, y + 3, 0xFFFFFFFF, true);
-
         int points = Math.max(0, Math.min(20, value));
+
+        // Compact two-row indicator: no panel, no title, only the actual status.
+        if (armor) {
+            drawShieldIcon(graphics, x + 1, y + 2, color);
+        } else {
+            drawHungerIcon(graphics, x + 1, y + 2, color);
+        }
+
         for (int i = 0; i < 10; i++) {
-            int row = i / 2;
-            int column = i % 2;
-            int px = x + 6 + column * 9;
-            int py = y + 17 + row * 7;
+            int row = i / 5;
+            int column = i % 5;
+            int px = x + 2 + column * 4;
+            int py = y + 12 + row * 5;
 
-            boolean filled = points >= i * 2 + 1;
+            boolean full = points >= i * 2 + 2;
             boolean half = points == i * 2 + 1;
-
-            if (armor) {
-                drawShieldPip(graphics, px, py, filled, half, iconColor);
-            } else {
-                drawHungerPip(graphics, px, py, filled, half, iconColor);
-            }
+            drawTinyPip(graphics, px, py, full, half, color);
         }
     }
 
-    private static void drawShieldPip(
-            GuiGraphics graphics,
-            int x,
-            int y,
-            boolean filled,
-            boolean half,
-            int color
-    ) {
-        int c = filled ? color : 0xFF343B45;
-        graphics.fill(x + 2, y, x + 5, y + 2, c);
-        graphics.fill(x + 1, y + 2, x + 6, y + 5, c);
-        graphics.fill(x + 2, y + 5, x + 5, y + 7, c);
-        if (half) {
-            graphics.fill(x + 1, y + 2, x + 4, y + 5, color);
-        }
+    private static void drawShieldIcon(GuiGraphics graphics, int x, int y, int color) {
+        graphics.fill(x + 2, y, x + 5, y + 2, color);
+        graphics.fill(x + 1, y + 2, x + 6, y + 5, color);
+        graphics.fill(x + 2, y + 5, x + 5, y + 7, color);
+        graphics.fill(x + 3, y + 7, x + 4, y + 8, color);
     }
 
-    private static void drawHungerPip(
+    private static void drawHungerIcon(GuiGraphics graphics, int x, int y, int color) {
+        graphics.fill(x + 1, y + 2, x + 6, y + 5, color);
+        graphics.fill(x + 2, y + 1, x + 5, y + 6, color);
+        graphics.fill(x + 1, y + 3, x + 2, y + 5, color);
+    }
+
+    private static void drawTinyPip(
             GuiGraphics graphics,
             int x,
             int y,
-            boolean filled,
+            boolean full,
             boolean half,
             int color
     ) {
-        int c = filled ? color : 0xFF343B45;
-        graphics.fill(x + 1, y + 1, x + 6, y + 5, c);
-        graphics.fill(x + 2, y, x + 5, y + 6, c);
-        if (half) {
-            graphics.fill(x + 1, y + 1, x + 4, y + 5, color);
+        int empty = 0xFF303741;
+        graphics.fill(x, y, x + 3, y + 3, empty);
+
+        if (full) {
+            graphics.fill(x, y, x + 3, y + 3, color);
+        } else if (half) {
+            graphics.fill(x, y, x + 2, y + 3, color);
         }
     }
 
@@ -249,21 +269,18 @@ public final class CharacterHud {
             int x,
             int y,
             int width,
-            int height,
-            int fillColor,
-            int borderColor
+            int height
     ) {
-        graphics.fill(x + 3, y, x + width - 3, y + height, fillColor);
-        graphics.fill(x, y + 3, x + width, y + height - 3, fillColor);
+        graphics.fill(x + 2, y, x + width - 2, y + height, PANEL_FILL);
+        graphics.fill(x, y + 2, x + width, y + height - 2, PANEL_FILL);
 
-        graphics.fill(x + 3, y, x + width - 3, y + 2, borderColor);
-        graphics.fill(x + 3, y + height - 2, x + width - 3, y + height, 0xFF252C36);
-        graphics.fill(x, y + 3, x + 2, y + height - 3, borderColor);
-        graphics.fill(x + width - 2, y + 3, x + width, y + height - 3, 0xFF252C36);
+        // Thin 1px light edge + restrained lower shadow instead of a heavy frame.
+        graphics.fill(x + 3, y, x + width - 3, y + 1, PANEL_EDGE);
+        graphics.fill(x + 1, y + 2, x + 2, y + height - 3, PANEL_EDGE);
+        graphics.fill(x + width - 2, y + 2, x + width - 1, y + height - 3, PANEL_SHADOW);
+        graphics.fill(x + 3, y + height - 1, x + width - 3, y + height, PANEL_SHADOW);
 
-        graphics.fill(x + 1, y + 2, x + 3, y + 4, borderColor);
-        graphics.fill(x + width - 3, y + 2, x + width - 1, y + 4, borderColor);
-        graphics.fill(x + 1, y + height - 4, x + 3, y + height - 2, 0xFF252C36);
-        graphics.fill(x + width - 3, y + height - 4, x + width - 1, y + height - 2, 0xFF252C36);
+        graphics.fill(x + 1, y + 1, x + 3, y + 2, PANEL_EDGE);
+        graphics.fill(x + width - 3, y + 1, x + width - 1, y + 2, PANEL_SHADOW);
     }
 }
