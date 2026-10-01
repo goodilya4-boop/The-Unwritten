@@ -5,7 +5,6 @@ import com.theunwritten.character.ResourceType;
 import com.theunwritten.network.ResourceSyncClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -122,16 +121,22 @@ public final class CharacterHud {
         drawExperienceBar(graphics, minecraft, xpX, xpY, xpWidth, xpHeight);
 
         // Armor / hunger indicators flank the resource cluster.
-        TextureSize sideSize = getTextureSize(minecraft, ARMOR);
-        int sideWidth = scaledWidth(sideSize, SIDE_MAX_SIZE, SIDE_MAX_SIZE);
-        int sideHeight = scaledHeight(sideSize, SIDE_MAX_SIZE, SIDE_MAX_SIZE);
-        int sideY = topY + (levelHeight - sideHeight) / 2;
-        int armorX = leftBarX - sideWidth - 8;
+        TextureSize armorSize = getTextureSize(minecraft, ARMOR);
+        TextureSize hungerSize = getTextureSize(minecraft, HUNGER);
+
+        int armorWidth = scaledWidth(armorSize, SIDE_MAX_SIZE, SIDE_MAX_SIZE);
+        int armorHeight = scaledHeight(armorSize, SIDE_MAX_SIZE, SIDE_MAX_SIZE);
+        int hungerWidth = scaledWidth(hungerSize, SIDE_MAX_SIZE, SIDE_MAX_SIZE);
+        int hungerHeight = scaledHeight(hungerSize, SIDE_MAX_SIZE, SIDE_MAX_SIZE);
+
+        int armorY = topY + (levelHeight - armorHeight) / 2;
+        int hungerY = topY + (levelHeight - hungerHeight) / 2;
+        int armorX = leftBarX - armorWidth - 8;
         int hungerX = rightBarX + resourceWidth + 8;
 
-        drawSideIndicator(graphics, minecraft, armorX, sideY, sideWidth, sideHeight,
+        drawSideIndicator(graphics, minecraft, armorX, armorY, armorWidth, armorHeight,
                 ARMOR, minecraft.player.getArmorValue());
-        drawSideIndicator(graphics, minecraft, hungerX, sideY, sideWidth, sideHeight,
+        drawSideIndicator(graphics, minecraft, hungerX, hungerY, hungerWidth, hungerHeight,
                 HUNGER, minecraft.player.getFoodData().getFoodLevel());
     }
 
