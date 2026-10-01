@@ -5,7 +5,11 @@ import com.theunwritten.character.ResourceType;
 import com.theunwritten.network.ResourceSyncClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.client.renderer.texture.NativeImage;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -13,6 +17,10 @@ import net.neoforged.fml.common.EventBusSubscriber.Bus;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @EventBusSubscriber(modid = TheUnwritten.MODID, bus = Bus.GAME, value = Dist.CLIENT)
 public final class CharacterHud {
@@ -25,13 +33,15 @@ public final class CharacterHud {
     private static final ResourceLocation ARMOR = texture("armor_indicator_empty.png");
     private static final ResourceLocation HUNGER = texture("hunger_indicator_empty.png");
 
-    private static final int BAR_WIDTH = 84;
-    private static final int BAR_HEIGHT = 12;
-    private static final int BAR_GAP = 8;
-    private static final int LEVEL_SIZE = 24;
-    private static final int XP_WIDTH = 184;
-    private static final int XP_HEIGHT = 8;
-    private static final int SIDE_SIZE = 20;
+    private static final int RESOURCE_MAX_WIDTH = 150;
+    private static final int RESOURCE_MAX_HEIGHT = 20;
+    private static final int RESOURCE_GAP = 8;
+    private static final int LEVEL_MAX_SIZE = 38;
+    private static final int XP_MAX_WIDTH = 220;
+    private static final int XP_MAX_HEIGHT = 12;
+    private static final int SIDE_MAX_SIZE = 26;
+
+    private static final Map<ResourceLocation, TextureSize> TEXTURE_SIZES = new HashMap<>();
 
     private CharacterHud() {
     }
@@ -67,50 +77,67 @@ public final class CharacterHud {
         int height = graphics.guiHeight();
         int centerX = width / 2;
 
-        // Same bottom HUD area as vanilla health, hunger and experience.
-        int topY = height - 62;
-        int bottomY = topY + BAR_HEIGHT + 7;
+        TextureSize resourceSize = getTextureSize(minecraft, HEALTH);
+        int resourceWidth = scaledWidth(resourceSize, RESOURCE_MAX_WIDTH, RESOURCE_MAX_HEIGHT);
+        int resourceHeight = scaledHeight(resourceSize, RESOURCE_MAX_WIDTH, RESOURCE_MAX_HEIGHT);
 
-        int leftBarX = centerX - LEVEL_SIZE / 2 - BAR_GAP - BAR_WIDTH;
-        int rightBarX = centerX + LEVEL_SIZE / 2 + BAR_GAP;
+        TextureSize levelSize = getTextureSize(minecraft, LEVEL);
+        int levelWidth = scaledWidth(levelSize, LEVEL_MAX_SIZE, LEVEL_MAX_SIZE);
+        int levelHeight = scaledHeight(levelSize, LEVEL_MAX_SIZE, LEVEL_MAX_SIZE);
 
-        // Top: mana / energy.
-        drawResourceBar(graphics, leftBarX, topY, BAR_WIDTH, BAR_HEIGHT,
-                MANA, ResourceType.MANA, 0xFF4D75D1);
-        drawResourceBar(graphics, rightBarX, topY, BAR_WIDTH, BAR_HEIGHT,
-                ENERGY, ResourceType.FOCUS, 0xFFD0A13A);
+        int topY = height - 68;
+        int bottomY = topY + resourceHeight + 7;
+
+        int leftBarX = centerX - levelWidth / 2 - RESOURCE_GAP - resourceWidth;
+        int rightBarX = centerX + levelWidth / 2 + RESOURCE_GAP;
+
+        // Top: energy / mana.
+        drawResourceBar(graphics, minecraft, leftBarX, topY, resourceWidth, resourceHeight,
+                ENERGY, ResourceType.FOCUS, 0xFF3F9DFF);
+        drawResourceBar(graphics, minecraft, rightBarX, topY, resourceWidth, resourceHeight,
+                MANA, ResourceType.MANA, 0xFFD2A63A);
 
         // Bottom: health / stamina.
-        drawResourceBar(graphics, leftBarX, bottomY, BAR_WIDTH, BAR_HEIGHT,
-                HEALTH, ResourceType.HEALTH, 0xFFB83A3A);
-        drawResourceBar(graphics, rightBarX, bottomY, BAR_WIDTH, BAR_HEIGHT,
-                STAMINA, ResourceType.STAMINA, 0xFFB88A3A);
+        drawResourceBar(graphics, minecraft, leftBarX, bottomY, resourceWidth, resourceHeight,
+                HEALTH, ResourceType.HEALTH, 0xFFE04444);
+        drawResourceBar(graphics, minecraft, rightBarX, bottomY, resourceWidth, resourceHeight,
+                STAMINA, ResourceType.STAMINA, 0xFF4CAF50);
 
         // Level diamond in the center.
-        int levelX = centerX - LEVEL_SIZE / 2;
-        int levelY = topY - 1;
-        graphics.blit(LEVEL, levelX, levelY, 0, 0, LEVEL_SIZE, LEVEL_SIZE, LEVEL_SIZE, LEVEL_SIZE);
+        int levelX = centerX - levelWidth / 2;
+        int levelY = topY + (resourceHeight - levelHeight) / 2;
+        drawTexture(graphics, minecraft, LEVEL, levelX, levelY, levelWidth, levelHeight);
 
         String levelText = Integer.toString(minecraft.player.experienceLevel);
         int levelTextX = centerX - minecraft.font.width(levelText) / 2;
-        graphics.drawString(minecraft.font, levelText, levelTextX, levelY + 8, 0xFFFFFFFF, true);
+        int levelTextY = levelY + levelHeight / 2 - 4;
+        graphics.drawString(minecraft.font, levelText, levelTextX, levelTextY, 0xFFFFFFFF, true);
 
-        // Experience below the whole resource cluster.
-        int xpX = centerX - XP_WIDTH / 2;
-        int xpY = bottomY + BAR_HEIGHT + 5;
-        drawExperienceBar(graphics, minecraft, xpX, xpY);
+        // Experience below the complete resource cluster.
+        TextureSize xpSize = getTextureSize(minecraft, EXPERIENCE);
+        int xpWidth = scaledWidth(xpSize, XP_MAX_WIDTH, XP_MAX_HEIGHT);
+        int xpHeight = scaledHeight(xpSize, XP_MAX_WIDTH, XP_MAX_HEIGHT);
+        int xpX = centerX - xpWidth / 2;
+        int xpY = bottomY + resourceHeight + 5;
+        drawExperienceBar(graphics, minecraft, xpX, xpY, xpWidth, xpHeight);
 
         // Armor / hunger indicators flank the resource cluster.
-        int sideY = topY + (LEVEL_SIZE - SIDE_SIZE) / 2;
-        int armorX = leftBarX - SIDE_SIZE - 7;
-        int hungerX = rightBarX + BAR_WIDTH + 7;
+        TextureSize sideSize = getTextureSize(minecraft, ARMOR);
+        int sideWidth = scaledWidth(sideSize, SIDE_MAX_SIZE, SIDE_MAX_SIZE);
+        int sideHeight = scaledHeight(sideSize, SIDE_MAX_SIZE, SIDE_MAX_SIZE);
+        int sideY = topY + (levelHeight - sideHeight) / 2;
+        int armorX = leftBarX - sideWidth - 8;
+        int hungerX = rightBarX + resourceWidth + 8;
 
-        drawSideIndicator(graphics, minecraft, armorX, sideY, ARMOR, minecraft.player.getArmorValue());
-        drawSideIndicator(graphics, minecraft, hungerX, sideY, HUNGER, minecraft.player.getFoodData().getFoodLevel());
+        drawSideIndicator(graphics, minecraft, armorX, sideY, sideWidth, sideHeight,
+                ARMOR, minecraft.player.getArmorValue());
+        drawSideIndicator(graphics, minecraft, hungerX, sideY, sideWidth, sideHeight,
+                HUNGER, minecraft.player.getFoodData().getFoodLevel());
     }
 
     private static void drawResourceBar(
             GuiGraphics graphics,
+            Minecraft minecraft,
             int x,
             int y,
             int width,
@@ -126,23 +153,25 @@ public final class CharacterHud {
             graphics.fill(x, y, x + fillWidth, y + height, fillColor);
         }
 
-        graphics.blit(texture, x, y, 0, 0, width, height, width, height);
+        drawTexture(graphics, minecraft, texture, x, y, width, height);
     }
 
     private static void drawExperienceBar(
             GuiGraphics graphics,
             Minecraft minecraft,
             int x,
-            int y
+            int y,
+            int width,
+            int height
     ) {
         double progress = Math.max(0.0D, Math.min(1.0D, minecraft.player.experienceProgress));
-        int fillWidth = (int) Math.round(progress * XP_WIDTH);
+        int fillWidth = (int) Math.round(progress * width);
 
         if (fillWidth > 0) {
-            graphics.fill(x, y, x + fillWidth, y + XP_HEIGHT, 0xFF5FBF45);
+            graphics.fill(x, y, x + fillWidth, y + height, 0xFF5FBF45);
         }
 
-        graphics.blit(EXPERIENCE, x, y, 0, 0, XP_WIDTH, XP_HEIGHT, XP_WIDTH, XP_HEIGHT);
+        drawTexture(graphics, minecraft, EXPERIENCE, x, y, width, height);
     }
 
     private static void drawSideIndicator(
@@ -150,13 +179,62 @@ public final class CharacterHud {
             Minecraft minecraft,
             int x,
             int y,
+            int width,
+            int height,
             ResourceLocation texture,
             int value
     ) {
-        graphics.blit(texture, x, y, 0, 0, SIDE_SIZE, SIDE_SIZE, SIDE_SIZE, SIDE_SIZE);
+        drawTexture(graphics, minecraft, texture, x, y, width, height);
 
         String text = Integer.toString(value);
-        int textX = x + SIDE_SIZE / 2 - minecraft.font.width(text) / 2;
-        graphics.drawString(minecraft.font, text, textX, y + 6, 0xFFFFFFFF, true);
+        int textX = x + width / 2 - minecraft.font.width(text) / 2;
+        int textY = y + height / 2 - 4;
+        graphics.drawString(minecraft.font, text, textX, textY, 0xFFFFFFFF, true);
+    }
+
+    private static void drawTexture(
+            GuiGraphics graphics,
+            Minecraft minecraft,
+            ResourceLocation texture,
+            int x,
+            int y,
+            int width,
+            int height
+    ) {
+        TextureSize size = getTextureSize(minecraft, texture);
+        graphics.blit(texture, x, y, 0, 0, width, height, size.width(), size.height());
+    }
+
+    private static TextureSize getTextureSize(Minecraft minecraft, ResourceLocation texture) {
+        return TEXTURE_SIZES.computeIfAbsent(texture, key -> {
+            ResourceManager manager = minecraft.getResourceManager();
+            try {
+                Resource resource = manager.getResource(key).orElseThrow();
+                try (NativeImage image = NativeImage.read(resource.open())) {
+                    return new TextureSize(image.getWidth(), image.getHeight());
+                }
+            } catch (IOException | RuntimeException exception) {
+                return new TextureSize(1, 1);
+            }
+        });
+    }
+
+    private static int scaledWidth(TextureSize size, int maxWidth, int maxHeight) {
+        double scale = Math.min(
+                maxWidth / (double) size.width(),
+                maxHeight / (double) size.height()
+        );
+        return Math.max(1, (int) Math.round(size.width() * scale));
+    }
+
+    private static int scaledHeight(TextureSize size, int maxWidth, int maxHeight) {
+        double scale = Math.min(
+                maxWidth / (double) size.width(),
+                maxHeight / (double) size.height()
+        );
+        return Math.max(1, (int) Math.round(size.height() * scale));
+    }
+
+    private record TextureSize(int width, int height) {
     }
 }
